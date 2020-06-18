@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 [![Build Status](https://travis-ci.org/Iowa-Flood-Center/asynch.svg?branch=master)](https://travis-ci.org/Iowa-Flood-Center/asynch)
+=======
+# asynch_richards (Under development)
+>>>>>>> 306899f2de95c7617e0e056a6fd8c8ace1471910
 
-# ASYNCH
+Integrating Richards equation in Iowa Flood Center's Asynch solver 
 
+<<<<<<< HEAD
 A numerical library for solving differential equations with a tree structure. Emphasis is given to hillslope-link river basin models.
 
 ## Documentation
@@ -23,3 +28,5 @@ The html documentation is generated in `docs/.build/html`.
 ## Testing
 
 Asynch doesn't have a good test covergage at the moment but the unit test framework is in place.
+=======
+>>>>>>> 306899f2de95c7617e0e056a6fd8c8ace1471910
