@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [![Build Status](https://travis-ci.org/Iowa-Flood-Center/asynch.svg?branch=master)](https://travis-ci.org/Iowa-Flood-Center/asynch)
 
 # ASYNCH
@@ -23,3 +24,6 @@ The html documentation is generated in `docs/.build/html`.
 ## Testing
 
 Asynch doesn't have a good test covergage at the moment but the unit test framework is in place.
+=======
+# asynch_richards
+>>>>>>> e20b3176d41313354dc5b8ef3129e07a7cbb4d31
