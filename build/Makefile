@@ -81,7 +81,7 @@ subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/config.h.in ar-lib compile config.guess config.sub \
-	install-sh missing
+	depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_blas.m4 \
 	$(top_srcdir)/m4/ax_check_zlib.m4 \
@@ -252,12 +252,12 @@ MKDIR_P = /usr/bin/mkdir -p
 MPICC = 
 OBJEXT = o
 PACKAGE = asynch
-PACKAGE_BUGREPORT = samuel-debionne@uiowa.edu
+PACKAGE_BUGREPORT = andre-zanchetta@uiowa.edu
 PACKAGE_NAME = asynch
-PACKAGE_STRING = asynch 1.4.2
+PACKAGE_STRING = asynch 1.4.3
 PACKAGE_TARNAME = asynch
 PACKAGE_URL = 
-PACKAGE_VERSION = 1.4.2
+PACKAGE_VERSION = 1.4.3
 PATH_SEPARATOR = :
 PETSC_CFLAGS = 
 PETSC_LIBS = 
@@ -274,7 +274,7 @@ SED = /usr/bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 1.4.2
+VERSION = 1.4.3
 abs_builddir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build
 abs_srcdir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build/..
 abs_top_builddir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build

@@ -69,6 +69,12 @@ unsigned int PassesBinaryFiles(Forcing* forcing, double maxtime, ConnData* conni
     return passes;
 }
 
+//For flag = 5
+unsigned int PassesIrregularBinaryFiles(Forcing* forcing, double maxtime, ConnData* conninfo)
+{
+    return (unsigned int)((forcing->last_file - forcing->first_file + 1) / (60.0*forcing->increment*forcing->file_time)) + 1;
+}
+
 
 #if defined(HAVE_POSTGRESQL)
 
@@ -149,6 +155,28 @@ double NextForcingBinaryFiles(Link* sys, unsigned int N, Link **my_sys, unsigned
     Create_Rain_Data_Par(sys, N, my_sys, my_N, globals, assignments, forcing->filename, forcing->first_file + iteration*forcing->increment, maxfileindex, iteration*forcing->file_time*forcing->increment, forcing->file_time, forcing, id_to_loc, forcing->increment + 1, forcing_idx);
 
     (forcing->iteration)++;
+    return maxtime;
+}
+
+//For flag = 5
+double NextForcingIrregularBinaryFiles(Link* sys, unsigned int N, Link **my_sys, unsigned int my_N, int* assignments, const GlobalVars * const globals, Forcing* forcing, ConnData* db_connections, const Lookup * const id_to_loc, unsigned int forcing_idx)
+{
+    unsigned int passes = forcing->passes, iteration = forcing->iteration;
+
+    double maxtime;
+    if (iteration == passes - 1)
+        maxtime = globals->maxtime;
+    else
+        maxtime = min(globals->maxtime, (iteration + 1)*forcing->file_time*forcing->increment);
+
+    int each_advance = forcing->increment * (forcing->file_time * 60);
+    int minfileindex = forcing->first_file + (iteration * each_advance);
+    int maxfileindex = (int)min((double)forcing->first_file + (iteration + 1)*each_advance, (double)(forcing->last_file + 1));
+
+    Create_Rain_Data_Par_IBin(sys, N, my_sys, my_N, globals, assignments, forcing->filename, minfileindex, maxfileindex, iteration*forcing->file_time*forcing->increment, forcing->file_time, forcing, id_to_loc, forcing->increment + 1, forcing_idx);
+
+    (forcing->iteration)++;
+
     return maxtime;
 }
 

@@ -149,7 +149,8 @@ am__libasynch_a_SOURCES_DIST = advance.c asynch_interface.c blas.c \
 	comm.c compression.c config_gbl.c data_types.c date_manip.c \
 	db.c forcings.c forcings_io.c io.c misc.c outputs.c \
 	partition.c processdata.c riversys.c rksteppers.c sort.c \
-	system.c models/check_consistency.c models/check_state.c \
+	system.c models/check_consistency.c \
+	models/output_constraints.c models/check_state.c \
 	models/definitions.c models/equations.c solvers/dopri5_dense.c \
 	solvers/lagrange.c solvers/radau.c solvers/rk3_2_dense.c \
 	solvers/rk4_3_dense.c steppers/explicit.c \
@@ -160,13 +161,15 @@ am__libasynch_a_SOURCES_DIST = advance.c asynch_interface.c blas.c \
 	libpq_fwd.h minmax.h misc.h outputs.h partition.h \
 	processdata.h riversys.h rkmethods.h rksteppers.h sort.h \
 	structs.h structs_fwd.h system.h models/check_consistency.h \
-	models/check_state.h models/definitions.h models/equations.h \
-	models/model.h solvers/lagrange.h assim/ancillary.c \
+	models/output_constraints.h models/check_state.h \
+	models/definitions.h models/equations.h models/model.h \
+	solvers/lagrange.h assim/ancillary.c \
 	assim/linear_least_squares.c assim/models.c assim/ancillary.h \
 	assim/linear_least_squares.h assim/models.h assim/structs.h
-#am__objects_1 = ancillary.$(OBJEXT) \
-#	linear_least_squares.$(OBJEXT) \
-#	models.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+#am__objects_1 = assim/ancillary.$(OBJEXT) \
+#	assim/linear_least_squares.$(OBJEXT) \
+#	assim/models.$(OBJEXT)
 am_libasynch_a_OBJECTS = advance.$(OBJEXT) asynch_interface.$(OBJEXT) \
 	blas.$(OBJEXT) comm.$(OBJEXT) compression.$(OBJEXT) \
 	config_gbl.$(OBJEXT) data_types.$(OBJEXT) date_manip.$(OBJEXT) \
@@ -174,12 +177,15 @@ am_libasynch_a_OBJECTS = advance.$(OBJEXT) asynch_interface.$(OBJEXT) \
 	io.$(OBJEXT) misc.$(OBJEXT) outputs.$(OBJEXT) \
 	partition.$(OBJEXT) processdata.$(OBJEXT) riversys.$(OBJEXT) \
 	rksteppers.$(OBJEXT) sort.$(OBJEXT) system.$(OBJEXT) \
-	check_consistency.$(OBJEXT) check_state.$(OBJEXT) \
-	definitions.$(OBJEXT) equations.$(OBJEXT) \
-	dopri5_dense.$(OBJEXT) lagrange.$(OBJEXT) radau.$(OBJEXT) \
-	rk3_2_dense.$(OBJEXT) rk4_3_dense.$(OBJEXT) explicit.$(OBJEXT) \
-	explicit_index1.$(OBJEXT) explicit_index1_dam.$(OBJEXT) \
-	forced.$(OBJEXT) $(am__objects_1)
+	models/check_consistency.$(OBJEXT) \
+	models/output_constraints.$(OBJEXT) \
+	models/check_state.$(OBJEXT) models/definitions.$(OBJEXT) \
+	models/equations.$(OBJEXT) solvers/dopri5_dense.$(OBJEXT) \
+	solvers/lagrange.$(OBJEXT) solvers/radau.$(OBJEXT) \
+	solvers/rk3_2_dense.$(OBJEXT) solvers/rk4_3_dense.$(OBJEXT) \
+	steppers/explicit.$(OBJEXT) steppers/explicit_index1.$(OBJEXT) \
+	steppers/explicit_index1_dam.$(OBJEXT) \
+	steppers/forced.$(OBJEXT) $(am__objects_1)
 libasynch_a_OBJECTS = $(am_libasynch_a_OBJECTS)
 #am__EXEEXT_1 = assim$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
@@ -215,10 +221,6 @@ DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-AM_V_lt = $(am__v_lt_$(V))
-am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_$(V))
@@ -317,12 +319,12 @@ MKDIR_P = /usr/bin/mkdir -p
 MPICC = 
 OBJEXT = o
 PACKAGE = asynch
-PACKAGE_BUGREPORT = samuel-debionne@uiowa.edu
+PACKAGE_BUGREPORT = andre-zanchetta@uiowa.edu
 PACKAGE_NAME = asynch
-PACKAGE_STRING = asynch 1.4.2
+PACKAGE_STRING = asynch 1.4.3
 PACKAGE_TARNAME = asynch
 PACKAGE_URL = 
-PACKAGE_VERSION = 1.4.2
+PACKAGE_VERSION = 1.4.3
 PATH_SEPARATOR = :
 PETSC_CFLAGS = 
 PETSC_LIBS = 
@@ -339,7 +341,7 @@ SED = /usr/bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 1.4.2
+VERSION = 1.4.3
 abs_builddir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build/src
 abs_srcdir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build/../src
 abs_top_builddir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build
@@ -397,17 +399,18 @@ libasynch_a_SOURCES = advance.c asynch_interface.c blas.c comm.c \
 	compression.c config_gbl.c data_types.c date_manip.c db.c \
 	forcings.c forcings_io.c io.c misc.c outputs.c partition.c \
 	processdata.c riversys.c rksteppers.c sort.c system.c \
-	models/check_consistency.c models/check_state.c \
-	models/definitions.c models/equations.c solvers/dopri5_dense.c \
-	solvers/lagrange.c solvers/radau.c solvers/rk3_2_dense.c \
-	solvers/rk4_3_dense.c steppers/explicit.c \
-	steppers/explicit_index1.c steppers/explicit_index1_dam.c \
-	steppers/forced.c advance.h asynch_interface.h blas.h comm.h \
-	compression.h config_gbl.h constants.h data_types.h \
-	date_manip.h db.h forcings.h forcings_io.h globals.h io.h \
-	libpq_fwd.h minmax.h misc.h outputs.h partition.h \
-	processdata.h riversys.h rkmethods.h rksteppers.h sort.h \
-	structs.h structs_fwd.h system.h models/check_consistency.h \
+	models/check_consistency.c models/output_constraints.c \
+	models/check_state.c models/definitions.c models/equations.c \
+	solvers/dopri5_dense.c solvers/lagrange.c solvers/radau.c \
+	solvers/rk3_2_dense.c solvers/rk4_3_dense.c \
+	steppers/explicit.c steppers/explicit_index1.c \
+	steppers/explicit_index1_dam.c steppers/forced.c advance.h \
+	asynch_interface.h blas.h comm.h compression.h config_gbl.h \
+	constants.h data_types.h date_manip.h db.h forcings.h \
+	forcings_io.h globals.h io.h libpq_fwd.h minmax.h misc.h \
+	outputs.h partition.h processdata.h riversys.h rkmethods.h \
+	rksteppers.h sort.h structs.h structs_fwd.h system.h \
+	models/check_consistency.h models/output_constraints.h \
 	models/check_state.h models/definitions.h models/equations.h \
 	models/model.h solvers/lagrange.h $(am__append_1)
 asynch_SOURCES = optparse.c optparse.h asynch_cli.c
@@ -483,6 +486,64 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
+models/$(am__dirstamp):
+	@$(MKDIR_P) models
+	@: > models/$(am__dirstamp)
+models/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) models/$(DEPDIR)
+	@: > models/$(DEPDIR)/$(am__dirstamp)
+models/check_consistency.$(OBJEXT): models/$(am__dirstamp) \
+	models/$(DEPDIR)/$(am__dirstamp)
+models/output_constraints.$(OBJEXT): models/$(am__dirstamp) \
+	models/$(DEPDIR)/$(am__dirstamp)
+models/check_state.$(OBJEXT): models/$(am__dirstamp) \
+	models/$(DEPDIR)/$(am__dirstamp)
+models/definitions.$(OBJEXT): models/$(am__dirstamp) \
+	models/$(DEPDIR)/$(am__dirstamp)
+models/equations.$(OBJEXT): models/$(am__dirstamp) \
+	models/$(DEPDIR)/$(am__dirstamp)
+solvers/$(am__dirstamp):
+	@$(MKDIR_P) solvers
+	@: > solvers/$(am__dirstamp)
+solvers/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) solvers/$(DEPDIR)
+	@: > solvers/$(DEPDIR)/$(am__dirstamp)
+solvers/dopri5_dense.$(OBJEXT): solvers/$(am__dirstamp) \
+	solvers/$(DEPDIR)/$(am__dirstamp)
+solvers/lagrange.$(OBJEXT): solvers/$(am__dirstamp) \
+	solvers/$(DEPDIR)/$(am__dirstamp)
+solvers/radau.$(OBJEXT): solvers/$(am__dirstamp) \
+	solvers/$(DEPDIR)/$(am__dirstamp)
+solvers/rk3_2_dense.$(OBJEXT): solvers/$(am__dirstamp) \
+	solvers/$(DEPDIR)/$(am__dirstamp)
+solvers/rk4_3_dense.$(OBJEXT): solvers/$(am__dirstamp) \
+	solvers/$(DEPDIR)/$(am__dirstamp)
+steppers/$(am__dirstamp):
+	@$(MKDIR_P) steppers
+	@: > steppers/$(am__dirstamp)
+steppers/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) steppers/$(DEPDIR)
+	@: > steppers/$(DEPDIR)/$(am__dirstamp)
+steppers/explicit.$(OBJEXT): steppers/$(am__dirstamp) \
+	steppers/$(DEPDIR)/$(am__dirstamp)
+steppers/explicit_index1.$(OBJEXT): steppers/$(am__dirstamp) \
+	steppers/$(DEPDIR)/$(am__dirstamp)
+steppers/explicit_index1_dam.$(OBJEXT): steppers/$(am__dirstamp) \
+	steppers/$(DEPDIR)/$(am__dirstamp)
+steppers/forced.$(OBJEXT): steppers/$(am__dirstamp) \
+	steppers/$(DEPDIR)/$(am__dirstamp)
+assim/$(am__dirstamp):
+	@$(MKDIR_P) assim
+	@: > assim/$(am__dirstamp)
+assim/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) assim/$(DEPDIR)
+	@: > assim/$(DEPDIR)/$(am__dirstamp)
+assim/ancillary.$(OBJEXT): assim/$(am__dirstamp) \
+	assim/$(DEPDIR)/$(am__dirstamp)
+assim/linear_least_squares.$(OBJEXT): assim/$(am__dirstamp) \
+	assim/$(DEPDIR)/$(am__dirstamp)
+assim/models.$(OBJEXT): assim/$(am__dirstamp) \
+	assim/$(DEPDIR)/$(am__dirstamp)
 
 libasynch.a: $(libasynch_a_OBJECTS) $(libasynch_a_DEPENDENCIES) $(EXTRA_libasynch_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libasynch.a
@@ -541,287 +602,70 @@ asynch$(EXEEXT): $(asynch_OBJECTS) $(asynch_DEPENDENCIES) $(EXTRA_asynch_DEPENDE
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f assim/*.$(OBJEXT)
+	-rm -f models/*.$(OBJEXT)
+	-rm -f solvers/*.$(OBJEXT)
+	-rm -f steppers/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/advance.Po
-include ./$(DEPDIR)/ancillary.Po
 include ./$(DEPDIR)/assim_cli.Po
 include ./$(DEPDIR)/asynch_cli.Po
 include ./$(DEPDIR)/asynch_interface.Po
 include ./$(DEPDIR)/blas.Po
-include ./$(DEPDIR)/check_consistency.Po
-include ./$(DEPDIR)/check_state.Po
 include ./$(DEPDIR)/comm.Po
 include ./$(DEPDIR)/compression.Po
 include ./$(DEPDIR)/config_gbl.Po
 include ./$(DEPDIR)/data_types.Po
 include ./$(DEPDIR)/date_manip.Po
 include ./$(DEPDIR)/db.Po
-include ./$(DEPDIR)/definitions.Po
-include ./$(DEPDIR)/dopri5_dense.Po
-include ./$(DEPDIR)/equations.Po
-include ./$(DEPDIR)/explicit.Po
-include ./$(DEPDIR)/explicit_index1.Po
-include ./$(DEPDIR)/explicit_index1_dam.Po
-include ./$(DEPDIR)/forced.Po
 include ./$(DEPDIR)/forcings.Po
 include ./$(DEPDIR)/forcings_io.Po
 include ./$(DEPDIR)/io.Po
-include ./$(DEPDIR)/lagrange.Po
-include ./$(DEPDIR)/linear_least_squares.Po
 include ./$(DEPDIR)/misc.Po
-include ./$(DEPDIR)/models.Po
 include ./$(DEPDIR)/optparse.Po
 include ./$(DEPDIR)/outputs.Po
 include ./$(DEPDIR)/partition.Po
 include ./$(DEPDIR)/processdata.Po
-include ./$(DEPDIR)/radau.Po
 include ./$(DEPDIR)/riversys.Po
-include ./$(DEPDIR)/rk3_2_dense.Po
-include ./$(DEPDIR)/rk4_3_dense.Po
 include ./$(DEPDIR)/rksteppers.Po
 include ./$(DEPDIR)/sort.Po
 include ./$(DEPDIR)/system.Po
+include assim/$(DEPDIR)/ancillary.Po
+include assim/$(DEPDIR)/linear_least_squares.Po
+include assim/$(DEPDIR)/models.Po
+include models/$(DEPDIR)/check_consistency.Po
+include models/$(DEPDIR)/check_state.Po
+include models/$(DEPDIR)/definitions.Po
+include models/$(DEPDIR)/equations.Po
+include models/$(DEPDIR)/output_constraints.Po
+include solvers/$(DEPDIR)/dopri5_dense.Po
+include solvers/$(DEPDIR)/lagrange.Po
+include solvers/$(DEPDIR)/radau.Po
+include solvers/$(DEPDIR)/rk3_2_dense.Po
+include solvers/$(DEPDIR)/rk4_3_dense.Po
+include steppers/$(DEPDIR)/explicit.Po
+include steppers/$(DEPDIR)/explicit_index1.Po
+include steppers/$(DEPDIR)/explicit_index1_dam.Po
+include steppers/$(DEPDIR)/forced.Po
 
 .c.o:
-	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	$(AM_V_CC)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(COMPILE) -c $<
+#	$(AM_V_CC_no)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	$(AM_V_CC)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-check_consistency.o: models/check_consistency.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT check_consistency.o -MD -MP -MF $(DEPDIR)/check_consistency.Tpo -c -o check_consistency.o `test -f 'models/check_consistency.c' || echo '$(srcdir)/'`models/check_consistency.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/check_consistency.Tpo $(DEPDIR)/check_consistency.Po
-#	$(AM_V_CC)source='models/check_consistency.c' object='check_consistency.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o check_consistency.o `test -f 'models/check_consistency.c' || echo '$(srcdir)/'`models/check_consistency.c
-
-check_consistency.obj: models/check_consistency.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT check_consistency.obj -MD -MP -MF $(DEPDIR)/check_consistency.Tpo -c -o check_consistency.obj `if test -f 'models/check_consistency.c'; then $(CYGPATH_W) 'models/check_consistency.c'; else $(CYGPATH_W) '$(srcdir)/models/check_consistency.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/check_consistency.Tpo $(DEPDIR)/check_consistency.Po
-#	$(AM_V_CC)source='models/check_consistency.c' object='check_consistency.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o check_consistency.obj `if test -f 'models/check_consistency.c'; then $(CYGPATH_W) 'models/check_consistency.c'; else $(CYGPATH_W) '$(srcdir)/models/check_consistency.c'; fi`
-
-check_state.o: models/check_state.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT check_state.o -MD -MP -MF $(DEPDIR)/check_state.Tpo -c -o check_state.o `test -f 'models/check_state.c' || echo '$(srcdir)/'`models/check_state.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/check_state.Tpo $(DEPDIR)/check_state.Po
-#	$(AM_V_CC)source='models/check_state.c' object='check_state.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o check_state.o `test -f 'models/check_state.c' || echo '$(srcdir)/'`models/check_state.c
-
-check_state.obj: models/check_state.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT check_state.obj -MD -MP -MF $(DEPDIR)/check_state.Tpo -c -o check_state.obj `if test -f 'models/check_state.c'; then $(CYGPATH_W) 'models/check_state.c'; else $(CYGPATH_W) '$(srcdir)/models/check_state.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/check_state.Tpo $(DEPDIR)/check_state.Po
-#	$(AM_V_CC)source='models/check_state.c' object='check_state.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o check_state.obj `if test -f 'models/check_state.c'; then $(CYGPATH_W) 'models/check_state.c'; else $(CYGPATH_W) '$(srcdir)/models/check_state.c'; fi`
-
-definitions.o: models/definitions.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT definitions.o -MD -MP -MF $(DEPDIR)/definitions.Tpo -c -o definitions.o `test -f 'models/definitions.c' || echo '$(srcdir)/'`models/definitions.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/definitions.Tpo $(DEPDIR)/definitions.Po
-#	$(AM_V_CC)source='models/definitions.c' object='definitions.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o definitions.o `test -f 'models/definitions.c' || echo '$(srcdir)/'`models/definitions.c
-
-definitions.obj: models/definitions.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT definitions.obj -MD -MP -MF $(DEPDIR)/definitions.Tpo -c -o definitions.obj `if test -f 'models/definitions.c'; then $(CYGPATH_W) 'models/definitions.c'; else $(CYGPATH_W) '$(srcdir)/models/definitions.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/definitions.Tpo $(DEPDIR)/definitions.Po
-#	$(AM_V_CC)source='models/definitions.c' object='definitions.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o definitions.obj `if test -f 'models/definitions.c'; then $(CYGPATH_W) 'models/definitions.c'; else $(CYGPATH_W) '$(srcdir)/models/definitions.c'; fi`
-
-equations.o: models/equations.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT equations.o -MD -MP -MF $(DEPDIR)/equations.Tpo -c -o equations.o `test -f 'models/equations.c' || echo '$(srcdir)/'`models/equations.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/equations.Tpo $(DEPDIR)/equations.Po
-#	$(AM_V_CC)source='models/equations.c' object='equations.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o equations.o `test -f 'models/equations.c' || echo '$(srcdir)/'`models/equations.c
-
-equations.obj: models/equations.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT equations.obj -MD -MP -MF $(DEPDIR)/equations.Tpo -c -o equations.obj `if test -f 'models/equations.c'; then $(CYGPATH_W) 'models/equations.c'; else $(CYGPATH_W) '$(srcdir)/models/equations.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/equations.Tpo $(DEPDIR)/equations.Po
-#	$(AM_V_CC)source='models/equations.c' object='equations.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o equations.obj `if test -f 'models/equations.c'; then $(CYGPATH_W) 'models/equations.c'; else $(CYGPATH_W) '$(srcdir)/models/equations.c'; fi`
-
-dopri5_dense.o: solvers/dopri5_dense.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dopri5_dense.o -MD -MP -MF $(DEPDIR)/dopri5_dense.Tpo -c -o dopri5_dense.o `test -f 'solvers/dopri5_dense.c' || echo '$(srcdir)/'`solvers/dopri5_dense.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/dopri5_dense.Tpo $(DEPDIR)/dopri5_dense.Po
-#	$(AM_V_CC)source='solvers/dopri5_dense.c' object='dopri5_dense.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dopri5_dense.o `test -f 'solvers/dopri5_dense.c' || echo '$(srcdir)/'`solvers/dopri5_dense.c
-
-dopri5_dense.obj: solvers/dopri5_dense.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dopri5_dense.obj -MD -MP -MF $(DEPDIR)/dopri5_dense.Tpo -c -o dopri5_dense.obj `if test -f 'solvers/dopri5_dense.c'; then $(CYGPATH_W) 'solvers/dopri5_dense.c'; else $(CYGPATH_W) '$(srcdir)/solvers/dopri5_dense.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/dopri5_dense.Tpo $(DEPDIR)/dopri5_dense.Po
-#	$(AM_V_CC)source='solvers/dopri5_dense.c' object='dopri5_dense.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dopri5_dense.obj `if test -f 'solvers/dopri5_dense.c'; then $(CYGPATH_W) 'solvers/dopri5_dense.c'; else $(CYGPATH_W) '$(srcdir)/solvers/dopri5_dense.c'; fi`
-
-lagrange.o: solvers/lagrange.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lagrange.o -MD -MP -MF $(DEPDIR)/lagrange.Tpo -c -o lagrange.o `test -f 'solvers/lagrange.c' || echo '$(srcdir)/'`solvers/lagrange.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/lagrange.Tpo $(DEPDIR)/lagrange.Po
-#	$(AM_V_CC)source='solvers/lagrange.c' object='lagrange.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lagrange.o `test -f 'solvers/lagrange.c' || echo '$(srcdir)/'`solvers/lagrange.c
-
-lagrange.obj: solvers/lagrange.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lagrange.obj -MD -MP -MF $(DEPDIR)/lagrange.Tpo -c -o lagrange.obj `if test -f 'solvers/lagrange.c'; then $(CYGPATH_W) 'solvers/lagrange.c'; else $(CYGPATH_W) '$(srcdir)/solvers/lagrange.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/lagrange.Tpo $(DEPDIR)/lagrange.Po
-#	$(AM_V_CC)source='solvers/lagrange.c' object='lagrange.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lagrange.obj `if test -f 'solvers/lagrange.c'; then $(CYGPATH_W) 'solvers/lagrange.c'; else $(CYGPATH_W) '$(srcdir)/solvers/lagrange.c'; fi`
-
-radau.o: solvers/radau.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT radau.o -MD -MP -MF $(DEPDIR)/radau.Tpo -c -o radau.o `test -f 'solvers/radau.c' || echo '$(srcdir)/'`solvers/radau.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/radau.Tpo $(DEPDIR)/radau.Po
-#	$(AM_V_CC)source='solvers/radau.c' object='radau.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o radau.o `test -f 'solvers/radau.c' || echo '$(srcdir)/'`solvers/radau.c
-
-radau.obj: solvers/radau.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT radau.obj -MD -MP -MF $(DEPDIR)/radau.Tpo -c -o radau.obj `if test -f 'solvers/radau.c'; then $(CYGPATH_W) 'solvers/radau.c'; else $(CYGPATH_W) '$(srcdir)/solvers/radau.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/radau.Tpo $(DEPDIR)/radau.Po
-#	$(AM_V_CC)source='solvers/radau.c' object='radau.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o radau.obj `if test -f 'solvers/radau.c'; then $(CYGPATH_W) 'solvers/radau.c'; else $(CYGPATH_W) '$(srcdir)/solvers/radau.c'; fi`
-
-rk3_2_dense.o: solvers/rk3_2_dense.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rk3_2_dense.o -MD -MP -MF $(DEPDIR)/rk3_2_dense.Tpo -c -o rk3_2_dense.o `test -f 'solvers/rk3_2_dense.c' || echo '$(srcdir)/'`solvers/rk3_2_dense.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/rk3_2_dense.Tpo $(DEPDIR)/rk3_2_dense.Po
-#	$(AM_V_CC)source='solvers/rk3_2_dense.c' object='rk3_2_dense.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rk3_2_dense.o `test -f 'solvers/rk3_2_dense.c' || echo '$(srcdir)/'`solvers/rk3_2_dense.c
-
-rk3_2_dense.obj: solvers/rk3_2_dense.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rk3_2_dense.obj -MD -MP -MF $(DEPDIR)/rk3_2_dense.Tpo -c -o rk3_2_dense.obj `if test -f 'solvers/rk3_2_dense.c'; then $(CYGPATH_W) 'solvers/rk3_2_dense.c'; else $(CYGPATH_W) '$(srcdir)/solvers/rk3_2_dense.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/rk3_2_dense.Tpo $(DEPDIR)/rk3_2_dense.Po
-#	$(AM_V_CC)source='solvers/rk3_2_dense.c' object='rk3_2_dense.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rk3_2_dense.obj `if test -f 'solvers/rk3_2_dense.c'; then $(CYGPATH_W) 'solvers/rk3_2_dense.c'; else $(CYGPATH_W) '$(srcdir)/solvers/rk3_2_dense.c'; fi`
-
-rk4_3_dense.o: solvers/rk4_3_dense.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rk4_3_dense.o -MD -MP -MF $(DEPDIR)/rk4_3_dense.Tpo -c -o rk4_3_dense.o `test -f 'solvers/rk4_3_dense.c' || echo '$(srcdir)/'`solvers/rk4_3_dense.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/rk4_3_dense.Tpo $(DEPDIR)/rk4_3_dense.Po
-#	$(AM_V_CC)source='solvers/rk4_3_dense.c' object='rk4_3_dense.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rk4_3_dense.o `test -f 'solvers/rk4_3_dense.c' || echo '$(srcdir)/'`solvers/rk4_3_dense.c
-
-rk4_3_dense.obj: solvers/rk4_3_dense.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rk4_3_dense.obj -MD -MP -MF $(DEPDIR)/rk4_3_dense.Tpo -c -o rk4_3_dense.obj `if test -f 'solvers/rk4_3_dense.c'; then $(CYGPATH_W) 'solvers/rk4_3_dense.c'; else $(CYGPATH_W) '$(srcdir)/solvers/rk4_3_dense.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/rk4_3_dense.Tpo $(DEPDIR)/rk4_3_dense.Po
-#	$(AM_V_CC)source='solvers/rk4_3_dense.c' object='rk4_3_dense.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rk4_3_dense.obj `if test -f 'solvers/rk4_3_dense.c'; then $(CYGPATH_W) 'solvers/rk4_3_dense.c'; else $(CYGPATH_W) '$(srcdir)/solvers/rk4_3_dense.c'; fi`
-
-explicit.o: steppers/explicit.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT explicit.o -MD -MP -MF $(DEPDIR)/explicit.Tpo -c -o explicit.o `test -f 'steppers/explicit.c' || echo '$(srcdir)/'`steppers/explicit.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/explicit.Tpo $(DEPDIR)/explicit.Po
-#	$(AM_V_CC)source='steppers/explicit.c' object='explicit.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o explicit.o `test -f 'steppers/explicit.c' || echo '$(srcdir)/'`steppers/explicit.c
-
-explicit.obj: steppers/explicit.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT explicit.obj -MD -MP -MF $(DEPDIR)/explicit.Tpo -c -o explicit.obj `if test -f 'steppers/explicit.c'; then $(CYGPATH_W) 'steppers/explicit.c'; else $(CYGPATH_W) '$(srcdir)/steppers/explicit.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/explicit.Tpo $(DEPDIR)/explicit.Po
-#	$(AM_V_CC)source='steppers/explicit.c' object='explicit.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o explicit.obj `if test -f 'steppers/explicit.c'; then $(CYGPATH_W) 'steppers/explicit.c'; else $(CYGPATH_W) '$(srcdir)/steppers/explicit.c'; fi`
-
-explicit_index1.o: steppers/explicit_index1.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT explicit_index1.o -MD -MP -MF $(DEPDIR)/explicit_index1.Tpo -c -o explicit_index1.o `test -f 'steppers/explicit_index1.c' || echo '$(srcdir)/'`steppers/explicit_index1.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/explicit_index1.Tpo $(DEPDIR)/explicit_index1.Po
-#	$(AM_V_CC)source='steppers/explicit_index1.c' object='explicit_index1.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o explicit_index1.o `test -f 'steppers/explicit_index1.c' || echo '$(srcdir)/'`steppers/explicit_index1.c
-
-explicit_index1.obj: steppers/explicit_index1.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT explicit_index1.obj -MD -MP -MF $(DEPDIR)/explicit_index1.Tpo -c -o explicit_index1.obj `if test -f 'steppers/explicit_index1.c'; then $(CYGPATH_W) 'steppers/explicit_index1.c'; else $(CYGPATH_W) '$(srcdir)/steppers/explicit_index1.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/explicit_index1.Tpo $(DEPDIR)/explicit_index1.Po
-#	$(AM_V_CC)source='steppers/explicit_index1.c' object='explicit_index1.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o explicit_index1.obj `if test -f 'steppers/explicit_index1.c'; then $(CYGPATH_W) 'steppers/explicit_index1.c'; else $(CYGPATH_W) '$(srcdir)/steppers/explicit_index1.c'; fi`
-
-explicit_index1_dam.o: steppers/explicit_index1_dam.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT explicit_index1_dam.o -MD -MP -MF $(DEPDIR)/explicit_index1_dam.Tpo -c -o explicit_index1_dam.o `test -f 'steppers/explicit_index1_dam.c' || echo '$(srcdir)/'`steppers/explicit_index1_dam.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/explicit_index1_dam.Tpo $(DEPDIR)/explicit_index1_dam.Po
-#	$(AM_V_CC)source='steppers/explicit_index1_dam.c' object='explicit_index1_dam.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o explicit_index1_dam.o `test -f 'steppers/explicit_index1_dam.c' || echo '$(srcdir)/'`steppers/explicit_index1_dam.c
-
-explicit_index1_dam.obj: steppers/explicit_index1_dam.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT explicit_index1_dam.obj -MD -MP -MF $(DEPDIR)/explicit_index1_dam.Tpo -c -o explicit_index1_dam.obj `if test -f 'steppers/explicit_index1_dam.c'; then $(CYGPATH_W) 'steppers/explicit_index1_dam.c'; else $(CYGPATH_W) '$(srcdir)/steppers/explicit_index1_dam.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/explicit_index1_dam.Tpo $(DEPDIR)/explicit_index1_dam.Po
-#	$(AM_V_CC)source='steppers/explicit_index1_dam.c' object='explicit_index1_dam.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o explicit_index1_dam.obj `if test -f 'steppers/explicit_index1_dam.c'; then $(CYGPATH_W) 'steppers/explicit_index1_dam.c'; else $(CYGPATH_W) '$(srcdir)/steppers/explicit_index1_dam.c'; fi`
-
-forced.o: steppers/forced.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT forced.o -MD -MP -MF $(DEPDIR)/forced.Tpo -c -o forced.o `test -f 'steppers/forced.c' || echo '$(srcdir)/'`steppers/forced.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/forced.Tpo $(DEPDIR)/forced.Po
-#	$(AM_V_CC)source='steppers/forced.c' object='forced.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o forced.o `test -f 'steppers/forced.c' || echo '$(srcdir)/'`steppers/forced.c
-
-forced.obj: steppers/forced.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT forced.obj -MD -MP -MF $(DEPDIR)/forced.Tpo -c -o forced.obj `if test -f 'steppers/forced.c'; then $(CYGPATH_W) 'steppers/forced.c'; else $(CYGPATH_W) '$(srcdir)/steppers/forced.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/forced.Tpo $(DEPDIR)/forced.Po
-#	$(AM_V_CC)source='steppers/forced.c' object='forced.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o forced.obj `if test -f 'steppers/forced.c'; then $(CYGPATH_W) 'steppers/forced.c'; else $(CYGPATH_W) '$(srcdir)/steppers/forced.c'; fi`
-
-ancillary.o: assim/ancillary.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ancillary.o -MD -MP -MF $(DEPDIR)/ancillary.Tpo -c -o ancillary.o `test -f 'assim/ancillary.c' || echo '$(srcdir)/'`assim/ancillary.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/ancillary.Tpo $(DEPDIR)/ancillary.Po
-#	$(AM_V_CC)source='assim/ancillary.c' object='ancillary.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ancillary.o `test -f 'assim/ancillary.c' || echo '$(srcdir)/'`assim/ancillary.c
-
-ancillary.obj: assim/ancillary.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ancillary.obj -MD -MP -MF $(DEPDIR)/ancillary.Tpo -c -o ancillary.obj `if test -f 'assim/ancillary.c'; then $(CYGPATH_W) 'assim/ancillary.c'; else $(CYGPATH_W) '$(srcdir)/assim/ancillary.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/ancillary.Tpo $(DEPDIR)/ancillary.Po
-#	$(AM_V_CC)source='assim/ancillary.c' object='ancillary.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ancillary.obj `if test -f 'assim/ancillary.c'; then $(CYGPATH_W) 'assim/ancillary.c'; else $(CYGPATH_W) '$(srcdir)/assim/ancillary.c'; fi`
-
-linear_least_squares.o: assim/linear_least_squares.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT linear_least_squares.o -MD -MP -MF $(DEPDIR)/linear_least_squares.Tpo -c -o linear_least_squares.o `test -f 'assim/linear_least_squares.c' || echo '$(srcdir)/'`assim/linear_least_squares.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/linear_least_squares.Tpo $(DEPDIR)/linear_least_squares.Po
-#	$(AM_V_CC)source='assim/linear_least_squares.c' object='linear_least_squares.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o linear_least_squares.o `test -f 'assim/linear_least_squares.c' || echo '$(srcdir)/'`assim/linear_least_squares.c
-
-linear_least_squares.obj: assim/linear_least_squares.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT linear_least_squares.obj -MD -MP -MF $(DEPDIR)/linear_least_squares.Tpo -c -o linear_least_squares.obj `if test -f 'assim/linear_least_squares.c'; then $(CYGPATH_W) 'assim/linear_least_squares.c'; else $(CYGPATH_W) '$(srcdir)/assim/linear_least_squares.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/linear_least_squares.Tpo $(DEPDIR)/linear_least_squares.Po
-#	$(AM_V_CC)source='assim/linear_least_squares.c' object='linear_least_squares.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o linear_least_squares.obj `if test -f 'assim/linear_least_squares.c'; then $(CYGPATH_W) 'assim/linear_least_squares.c'; else $(CYGPATH_W) '$(srcdir)/assim/linear_least_squares.c'; fi`
-
-models.o: assim/models.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT models.o -MD -MP -MF $(DEPDIR)/models.Tpo -c -o models.o `test -f 'assim/models.c' || echo '$(srcdir)/'`assim/models.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/models.Tpo $(DEPDIR)/models.Po
-#	$(AM_V_CC)source='assim/models.c' object='models.o' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o models.o `test -f 'assim/models.c' || echo '$(srcdir)/'`assim/models.c
-
-models.obj: assim/models.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT models.obj -MD -MP -MF $(DEPDIR)/models.Tpo -c -o models.obj `if test -f 'assim/models.c'; then $(CYGPATH_W) 'assim/models.c'; else $(CYGPATH_W) '$(srcdir)/assim/models.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/models.Tpo $(DEPDIR)/models.Po
-#	$(AM_V_CC)source='assim/models.c' object='models.obj' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o models.obj `if test -f 'assim/models.c'; then $(CYGPATH_W) 'assim/models.c'; else $(CYGPATH_W) '$(srcdir)/assim/models.c'; fi`
+#	$(AM_V_CC_no)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -959,6 +803,14 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f assim/$(DEPDIR)/$(am__dirstamp)
+	-rm -f assim/$(am__dirstamp)
+	-rm -f models/$(DEPDIR)/$(am__dirstamp)
+	-rm -f models/$(am__dirstamp)
+	-rm -f solvers/$(DEPDIR)/$(am__dirstamp)
+	-rm -f solvers/$(am__dirstamp)
+	-rm -f steppers/$(DEPDIR)/$(am__dirstamp)
+	-rm -f steppers/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -969,7 +821,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) assim/$(DEPDIR) models/$(DEPDIR) solvers/$(DEPDIR) steppers/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1015,7 +867,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) assim/$(DEPDIR) models/$(DEPDIR) solvers/$(DEPDIR) steppers/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

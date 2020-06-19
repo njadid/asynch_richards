@@ -44,7 +44,8 @@ definitions.o: ../../src/models/definitions.c ../config.h /usr/include/assert.h 
  ../../src/structs_fwd.h ../../src/data_types.h ../../src/constants.h ../config.h \
  ../../src/models/model.h ../config.h ../../src/models/definitions.h \
  ../../src/models/equations.h ../../src/rkmethods.h \
- ../../src/models/check_consistency.h ../../src/models/check_state.h
+ ../../src/models/check_consistency.h ../../src/models/output_constraints.h \
+ ../../src/models/check_state.h
 
 ../config.h:
 
@@ -179,5 +180,7 @@ definitions.o: ../../src/models/definitions.c ../config.h /usr/include/assert.h 
 ../../src/rkmethods.h:
 
 ../../src/models/check_consistency.h:
+
+../../src/models/output_constraints.h:
 
 ../../src/models/check_state.h:

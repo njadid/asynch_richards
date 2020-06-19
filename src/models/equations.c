@@ -2477,7 +2477,7 @@ void navid_extra_water(double t, const double *const y_i, unsigned int dim, cons
 	double bc_lambda = params[11];
 	double psi_sat = params[12];
 
-	double S_L[10] = {0.05, 0.05, 0.05, 0.10, 0.30, 0.50, 1.0, 1.0, 1.0, 1.0}; // layer depths [m]
+	double S_L[10] = {0.01, 0.05, 0.05, 0.10, 0.30, 0.50, 1.0, 1.0, 1.0, 1.0}; // layer depths [m]
 	double L_Top = 5.0;
 
 	// Initial conditions (or from last iteration)
@@ -2520,12 +2520,12 @@ void navid_extra_water(double t, const double *const y_i, unsigned int dim, cons
 	}
 
 	double q_inf = q_t[0];
-	double q_pond_inf = flux_inf_pond(theta_s, s_t[0], K_sat, psi_sat, bc_lambda, theta_s, theta_r, 0.01, S_L[0], K_scheme);
+	double q_pond_inf = flux_inf_pond(theta_s, s_t[0], K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L[0], S_L[1], K_scheme);
 	if (q_rain > q_pond_inf)
 	{
 		dsp = q_rain - q_pond_inf - q_pl;
 		ds0 = (q_pond_inf - q_inf - e_t) / S_L[0];
-		extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0] - 0.01) / h : 0.0;
+		extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0]) / h : 0.0;
 		dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
 		ds0 = (q_pond_inf - q_inf - e_t) / S_L[0] - extra_flux;
 	}
@@ -2533,7 +2533,7 @@ void navid_extra_water(double t, const double *const y_i, unsigned int dim, cons
 	{
 		dsp = -q_pl;
 		ds0 = (q_rain - q_inf - e_t) / S_L[0];
-		extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0] - 0.01) / h : 0.0;
+		extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0]) / h : 0.0;
 		dsp = -q_pl + extra_flux * S_L[0];
 		ds0 = (q_rain - q_inf - e_t) / S_L[0] - extra_flux;
 	}

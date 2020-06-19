@@ -73,66 +73,60 @@ void SetDefaultOutputFunctions(char* outputname, Output *output, unsigned int* s
         output->type = ASYNCH_FLOAT;
         output->callback.out_float = &Output_State7;
     }
-	else if (strcmp(outputname, "State8") == 0)
-	{
-		states_used[(*num_states_used)++] = 8;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State8;
-	}
-	else if (strcmp(outputname, "State9") == 0)
-	{
-		states_used[(*num_states_used)++] = 9;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State9;
-	}
-	else if (strcmp(outputname, "State10") == 0)
-	{
-		states_used[(*num_states_used)++] = 10;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State10;
-	}
-	else if (strcmp(outputname, "State11") == 0)
-	{
-		states_used[(*num_states_used)++] = 11;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State11;
-	}
-	else if (strcmp(outputname, "State12") == 0)
-	{
-		states_used[(*num_states_used)++] = 12;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State12;
-	}
-	else if (strcmp(outputname, "State13") == 0)
-	{
-		states_used[(*num_states_used)++] = 13;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State13;
-	}
-	else if (strcmp(outputname, "State14") == 0)
-	{
-		states_used[(*num_states_used)++] = 14;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State14;
-	}
-	else if (strcmp(outputname, "State15") == 0)
-	{
-		states_used[(*num_states_used)++] = 15;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State15;
-	}
-	else if (strcmp(outputname, "State16") == 0)
-	{
-		states_used[(*num_states_used)++] = 16;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State16;
-	}
-	else if (strcmp(outputname, "State17") == 0)
-	{
-		states_used[(*num_states_used)++] = 17;
-		output->type = ASYNCH_FLOAT;
-		output->callback.out_float = &Output_State17;
-	}
+else if (strcmp(outputname, "State8") == 0)
+{
+	states_used[(*num_states_used)++] = 8;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State8;
+}
+else if (strcmp(outputname, "State9") == 0)
+{
+	states_used[(*num_states_used)++] = 9;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State9;
+}
+else if (strcmp(outputname, "State10") == 0)
+{
+	states_used[(*num_states_used)++] = 10;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State10;
+}
+else if (strcmp(outputname, "State11") == 0)
+{
+	states_used[(*num_states_used)++] = 11;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State11;
+}
+else if (strcmp(outputname, "State12") == 0)
+{
+	states_used[(*num_states_used)++] = 12;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State12;
+}
+else if (strcmp(outputname, "State13") == 0)
+{
+	states_used[(*num_states_used)++] = 13;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State13;
+}
+else if (strcmp(outputname, "State14") == 0)
+{
+	states_used[(*num_states_used)++] = 14;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State14;
+}
+else if (strcmp(outputname, "State15") == 0)
+{
+	states_used[(*num_states_used)++] = 15;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State15;
+}
+else if (strcmp(outputname, "State16") == 0)
+{
+	states_used[(*num_states_used)++] = 16;
+	output->type = ASYNCH_FLOAT;
+	output->callback.out_float = &Output_State16;
+}
     else if (strcmp(outputname, "TimeI") == 0)
     {
         output->type = ASYNCH_INT;
@@ -323,11 +317,6 @@ float Output_State15(unsigned int id, double t, double *y, unsigned int num_dof)
 float Output_State16(unsigned int id, double t, double *y, unsigned int num_dof)
 {
 	return (float)y[16];
-}
-
-float Output_State17(unsigned int id, double t, double *y, unsigned int num_dof)
-{
-	return (float)y[17];
 }
 
 int Output_Time_Int(unsigned int id, double t, double *y, unsigned int num_dof)

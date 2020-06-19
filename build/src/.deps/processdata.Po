@@ -94,7 +94,8 @@ processdata.o: ../../src/processdata.c ../config.h /usr/include/assert.h \
  /opt/apps/hdf5/1.8.18_parallel_studio-2017.1/include/H5IMpublic.h \
  /opt/apps/hdf5/1.8.18_parallel_studio-2017.1/include/H5TBpublic.h \
  /opt/apps/hdf5/1.8.18_parallel_studio-2017.1/include/H5PTpublic.h \
- ../../src/minmax.h ../../src/outputs.h ../../src/structs.h ../config.h \
+ ../../src/models/output_constraints.h ../../src/minmax.h ../../src/outputs.h \
+ ../../src/structs.h ../config.h \
  /opt/apps/parallel_studio/2017.1/compilers_and_libraries_2017.1.132/linux/compiler/include/stdbool.h \
  ../../src/libpq_fwd.h ../../src/asynch_interface.h /usr/include/assert.h \
  ../../src/structs_fwd.h ../../src/data_types.h ../../src/constants.h ../config.h \
@@ -335,6 +336,8 @@ processdata.o: ../../src/processdata.c ../config.h /usr/include/assert.h \
 /opt/apps/hdf5/1.8.18_parallel_studio-2017.1/include/H5TBpublic.h:
 
 /opt/apps/hdf5/1.8.18_parallel_studio-2017.1/include/H5PTpublic.h:
+
+../../src/models/output_constraints.h:
 
 ../../src/minmax.h:
 

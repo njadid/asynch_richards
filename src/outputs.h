@@ -46,8 +46,8 @@ float Output_State13(unsigned int id, double t, double *y, unsigned int num_dof)
 float Output_State14(unsigned int id, double t, double *y, unsigned int num_dof);
 float Output_State15(unsigned int id, double t, double *y, unsigned int num_dof);
 float Output_State16(unsigned int id, double t, double *y, unsigned int num_dof);
-float Output_State17(unsigned int id, double t, double *y, unsigned int num_dof);
 int Output_Time_Int(unsigned int id, double t, double *y, unsigned int num_dof);
+
 
 // Built-in Peakflow output functions
 void OutputPeakflow_Classic_Format(unsigned int ID, double peak_time, double *peak_value, double *params, double *global_params, double conversion, unsigned int area_idx, void* user, char* buffer);

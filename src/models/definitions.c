@@ -16,7 +16,9 @@
 #include <models/definitions.h>
 #include <models/equations.h>
 #include <models/check_consistency.h>
+#include <models/output_constraints.h>
 #include <models/check_state.h>
+
 
 //Sets the various sizes and flags for the model. This method should set the following fields:
 //dim:			The number of unknowns in the differential equations (or the number of ODEs at each link).
@@ -252,6 +254,42 @@ void SetParamSizes(
 	}
 	if (globals->num_global_params > num_global_params)
 		printf("\nWarning: Obtained %u parameters from .gbl file. Expected %u for model model_uid %hu.\n", globals->num_global_params, num_global_params, model_uid);
+}
+
+
+
+//Sets the function to be used when writing outputs. This method should set the following field:
+//output_constrains_hdf5
+//output_constrains_psql
+//output_constrains_rec
+void SetOutputConstraints(GlobalVars* globals)
+{
+    unsigned short int model_uid = globals->model_uid;
+    //Set dim and start of differential variables
+    switch (model_uid)
+    {
+        //--------------------------------------------------------------------------------------------
+        case 196:
+            globals->OutputConstrainsHdf5 = &OutputConstraints_Model196_Hdf5;
+            globals->OutputConstrainsPsql = NULL;
+            globals->OutputConstrainsRec = NULL;
+            break;
+        case 254:
+            globals->OutputConstrainsHdf5 = &OutputConstraints_Model254_Hdf5;
+            globals->OutputConstrainsPsql = NULL;
+            globals->OutputConstrainsRec = NULL;
+			break;
+        case 256:
+            globals->OutputConstrainsHdf5 = &OutputConstraints_Model256_Hdf5;
+            globals->OutputConstrainsPsql = NULL;
+            globals->OutputConstrainsRec = NULL;
+            break;
+        default:
+            globals->OutputConstrainsHdf5 = NULL;
+            globals->OutputConstrainsPsql = NULL;
+            globals->OutputConstrainsRec = NULL;
+            break;
+    }
 }
 
 

@@ -11,9 +11,6 @@
 /* Define if F77 and FC dummy `main' functions are identical. */
 /* #undef FC_DUMMY_MAIN_EQ_F77 */
 
-/* TODO */
-#define H5_VERSION "Not specified"
-
 /* Define if you have a BLAS library. */
 #define HAVE_BLAS 1
 
@@ -68,6 +65,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
+/* TODO */
+#define HDF5_VERSION "Not specified"
+
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 /* #undef NO_MINUS_C_MINUS_O */
 
@@ -78,13 +78,13 @@
 #define PACKAGE "asynch"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "samuel-debionne@uiowa.edu"
+#define PACKAGE_BUGREPORT "andre-zanchetta@uiowa.edu"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "asynch"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "asynch 1.4.2"
+#define PACKAGE_STRING "asynch 1.4.3"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "asynch"
@@ -93,7 +93,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.4.2"
+#define PACKAGE_VERSION "1.4.3"
 
 /* TODO */
 #define PQ_VERSION "Not specified"
@@ -105,7 +105,7 @@
 #define SZ_VERSION "Not specified"
 
 /* Version number of package */
-#define VERSION "1.4.2"
+#define VERSION "1.4.3"
 
 /* TODO */
 #define ZL_VERSION "Not specified"

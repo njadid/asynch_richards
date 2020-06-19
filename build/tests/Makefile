@@ -415,12 +415,12 @@ MKDIR_P = /usr/bin/mkdir -p
 MPICC = 
 OBJEXT = o
 PACKAGE = asynch
-PACKAGE_BUGREPORT = samuel-debionne@uiowa.edu
+PACKAGE_BUGREPORT = andre-zanchetta@uiowa.edu
 PACKAGE_NAME = asynch
-PACKAGE_STRING = asynch 1.4.2
+PACKAGE_STRING = asynch 1.4.3
 PACKAGE_TARNAME = asynch
 PACKAGE_URL = 
-PACKAGE_VERSION = 1.4.2
+PACKAGE_VERSION = 1.4.3
 PATH_SEPARATOR = :
 PETSC_CFLAGS = 
 PETSC_LIBS = 
@@ -437,7 +437,7 @@ SED = /usr/bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 1.4.2
+VERSION = 1.4.3
 abs_builddir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build/tests
 abs_srcdir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build/../tests
 abs_top_builddir = /Users/njadidoleslam/hlm_dev/asynch_richards/new_model/build
@@ -544,18 +544,20 @@ distclean-compile:
 include ./$(DEPDIR)/check_asynch.Po
 
 .c.o:
-	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	$(AM_V_CC)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(COMPILE) -c $<
+#	$(AM_V_CC_no)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	$(AM_V_CC)source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(COMPILE) -c `$(CYGPATH_W) '$<'`
+#	$(AM_V_CC_no)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
