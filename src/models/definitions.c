@@ -262,7 +262,28 @@ void SetParamSizes(
 		globals->num_forcings = 3;
 		globals->min_error_tolerances = 16;
 		break;
-
+	case 10008:	num_global_params = 13;
+		globals->uses_dam = 0;
+		globals->num_params = 13;
+		globals->dam_params_size = 0;
+		globals->area_idx = 0;
+		globals->areah_idx = 2;
+		globals->num_disk_params = 8;
+		globals->convertarea_flag = 0;
+		globals->num_forcings = 3;
+		globals->min_error_tolerances = 16;
+		break;
+	case 10009:	num_global_params = 13;
+		globals->uses_dam = 0;
+		globals->num_params = 13;
+		globals->dam_params_size = 0;
+		globals->area_idx = 0;
+		globals->areah_idx = 2;
+		globals->num_disk_params = 8;
+		globals->convertarea_flag = 0;
+		globals->num_forcings = 3;
+		globals->min_error_tolerances = 16;
+		break;
 		//--------------------------------------------------------------------------------------------
 	default:	printf("Error: Invalid model_uid (%u) in SetParamSizes.\n", model_uid);
 		MPI_Abort(MPI_COMM_WORLD, 1);
@@ -409,7 +430,7 @@ void ConvertParams(
 		params[2] *= 1e6;		//A_h: km^2 -> m^2
 		params[4] *= .001;		//H_h: mm -> m
 	}
-	else if (model_uid == 10007 ||model_uid == 10006 || model_uid == 10005 || model_uid == 10002 || model_uid == 1011 || model_uid == 10001 || model_uid==1009 || model_uid == 10000 || model_uid == 1008 || model_uid == 1010 || model_uid == 252 || model_uid == 253 || model_uid == 254 || model_uid == 255 || model_uid == 256 || model_uid == 257 || model_uid == 258 || model_uid == 259 || model_uid == 260 || model_uid == 261 || model_uid == 262 || model_uid == 263)
+	else if (model_uid == 10010 ||model_uid == 10009 ||model_uid == 10008 ||model_uid == 10007 ||model_uid == 10006 || model_uid == 10005 || model_uid == 10002 || model_uid == 1011 || model_uid == 10001 || model_uid==1009 || model_uid == 10000 || model_uid == 1008 || model_uid == 1010 || model_uid == 252 || model_uid == 253 || model_uid == 254 || model_uid == 255 || model_uid == 256 || model_uid == 257 || model_uid == 258 || model_uid == 259 || model_uid == 260 || model_uid == 261 || model_uid == 262 || model_uid == 263)
 	{
 		params[1] *= 1000;		//L_h: km -> m
 		params[2] *= 1e6;		//A_h: km^2 -> m^2
@@ -890,6 +911,72 @@ void InitRoutines(
 		link->check_state = NULL;
 		link->check_consistency = &CheckConsistency_Nonzero_AllStates_q;
 	}
+	else if (model_uid == 10008)
+	{
+		link->dim = 16;
+		link->no_ini_start = 16;
+		link->diff_start = 0;
+
+		link->num_dense = 2;
+		link->dense_indices = (unsigned int*)realloc(link->dense_indices, link->num_dense * sizeof(unsigned int));
+		link->dense_indices[0] = 0;
+		link->dense_indices[1] = 15;
+
+		if (link->has_res)
+		{
+			link->differential = &TopLayerHillslope_Reservoirs;
+			link->solver = &ForcedSolutionSolver;
+		}
+		else
+			link->differential = &navid_w_etTopOnly;
+		link->algebraic = NULL;
+		link->check_state = NULL;
+		link->check_consistency = &CheckConsistency_Nonzero_AllStates_q;
+	}
+	else if (model_uid == 10009)
+	{
+		link->dim = 16;
+		link->no_ini_start = 16;
+		link->diff_start = 0;
+
+		link->num_dense = 2;
+		link->dense_indices = (unsigned int*)realloc(link->dense_indices, link->num_dense * sizeof(unsigned int));
+		link->dense_indices[0] = 0;
+		link->dense_indices[1] = 15;
+
+		if (link->has_res)
+		{
+			link->differential = &TopLayerHillslope_Reservoirs;
+			link->solver = &ForcedSolutionSolver;
+		}
+		else
+			link->differential = &navid_wo_et;
+		link->algebraic = NULL;
+		link->check_state = NULL;
+		link->check_consistency = &CheckConsistency_Nonzero_AllStates_q;
+	}
+	else if (model_uid == 10010)
+	{
+		link->dim = 16;
+		link->no_ini_start = 16;
+		link->diff_start = 0;
+
+		link->num_dense = 2;
+		link->dense_indices = (unsigned int*)realloc(link->dense_indices, link->num_dense * sizeof(unsigned int));
+		link->dense_indices[0] = 0;
+		link->dense_indices[1] = 15;
+
+		if (link->has_res)
+		{
+			link->differential = &TopLayerHillslope_Reservoirs;
+			link->solver = &ForcedSolutionSolver;
+		}
+		else
+			link->differential = &navid_layered_params;
+		link->algebraic = NULL;
+		link->check_state = NULL;
+		link->check_consistency = &CheckConsistency_Nonzero_AllStates_q;
+	}
 	else {
 		printf("Warning: No ODE selected for link ID %u.\n", link->ID);
 	}
@@ -1205,7 +1292,7 @@ void InitRoutines(
 
 
 		}
-		else if (model_uid == 10002 || model_uid ==10005 || model_uid ==10006 || model_uid ==10007) {
+		else if (model_uid == 10002 || model_uid ==10005 || model_uid ==10006 || model_uid ==10007 || model_uid ==10008 || model_uid ==10009) {
 			double* vals = params;
 			double A_i = params[0];
 			double L_i = params[1];
@@ -1214,8 +1301,8 @@ void InitRoutines(
 			double kSat = params[3]; // saturated hydraulic conductivity [cm/hr]
 			double BC_lambda = params[4]; // Brooks-Corey's lambda [-]
 			double theta_s = params[5];// < 0.35 ? 0.35 : params[5]; // Saturated water content [-]
-			//theta_s = theta_s < 0.25 ? 0.40 : theta_s;
-			double theta_r = params[6];// > 0.15 ? 0.15 : params[6]; // Residual water content [-]
+			theta_s = theta_s < 0.25 ? 0.25 : theta_s;
+			double theta_r = params[6] > 0.15 ? 0.15 : params[6]; // Residual water content [-]
 			double psi_sat = params[7]; // Residual water content [-]
 
 			double v_0 = global_params[0];
@@ -1235,6 +1322,38 @@ void InitRoutines(
 			vals[11] = BC_lambda;
 			vals[12] = -1 * pow(10, psi_sat) * 10.0 * 0.01;
 		}
+		else if (model_uid==10010)
+		{
+			double* vals = params;
+			double A_i = params[0];
+			double L_i = params[1];
+			double A_h = params[2];
+
+			double kSat = params[3]; // saturated hydraulic conductivity [cm/hr]
+			double BC_lambda = params[4]; // Brooks-Corey's lambda [-]
+			double theta_s = params[5];// < 0.35 ? 0.35 : params[5]; // Saturated water content [-]
+			theta_s = theta_s < 0.25 ? 0.25 : theta_s;
+			double theta_r = params[6] > 0.15 ? 0.15 : params[6]; // Residual water content [-]
+			double psi_sat = params[7]; // Residual water content [-]
+
+			double v_0 = global_params[0];
+			double lambda_1 = global_params[1];
+			double lambda_2 = global_params[2];
+			double v_h = global_params[3];
+			double k_i_factor = global_params[5];
+
+			vals[3] = 60.0*v_0*pow(A_i, lambda_2) / ((1.0 - lambda_1)*L_i);	 // [1/min]  invtau
+			vals[4] = v_h * L_i / A_h * 60.0;                                // [1/min] k_2
+			vals[5] = vals[4] * k_i_factor;                                  // [1/min] k_i
+			vals[6] = (0.001 / 60.0);                                        // (mm/hr->m/min)  c_1
+			vals[7] = A_h / 60.0;                                            // c_2
+			vals[8] = pow(10.0, kSat)  * 0.01 / 60.0; // K_sat (cm/hr -> m/min)
+			vals[9] = theta_s;
+			vals[10] = theta_r;
+			vals[11] = BC_lambda;
+			vals[12] = -1 * pow(10, psi_sat) * 10.0 * 0.01;
+		}
+		
 	}
 
 
@@ -1308,7 +1427,7 @@ int ReadInitData(
 		y_0[104] = 0.0;
 		y_0[105] = y_0[0];
 	}
-	else if (model_uid == 10001 || model_uid == 10002 || model_uid==10005 || model_uid==10006|| model_uid==10007)
+	else if (model_uid == 10001 || model_uid == 10002 || model_uid==10005 || model_uid==10006|| model_uid==10007|| model_uid==10008 || model_uid==10009 || model_uid==10010)
 	{
 		y_0[13] = 0.0;
 		y_0[14] = 0.0;
