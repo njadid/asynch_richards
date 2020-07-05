@@ -1347,6 +1347,17 @@ void InitRoutines(
 			vals[5] = vals[4] * k_i_factor;                                  // [1/min] k_i
 			vals[6] = (0.001 / 60.0);                                        // (mm/hr->m/min)  c_1
 			vals[7] = A_h / 60.0;                                            // c_2
+
+			for (int i = 0; i < 10; i++)
+			{
+				vals[8+i] = pow(10.0, kSat)  * 0.01 / 60.0params[8+i]; //8:17 		K_sat
+				vals[8+10*1+i] = (int)(params[8+10*1+i] * 1000) / 1000.0; //18:27 	theta_s
+				vals[8+10*2+i] = params[8+10*2+i]; //28:37 							theta_r
+				vals[8+10*3+i] = params[8+10*3+i]; //38:47 							BC_lambda
+				vals[8+10*4+i] = -1 * pow(10, params[8+10*4+i]) * 10.0 * 0.01; //48:57 psi_sat
+			}
+
+
 			vals[8] = pow(10.0, kSat)  * 0.01 / 60.0; // K_sat (cm/hr -> m/min)
 			vals[9] = theta_s;
 			vals[10] = theta_r;

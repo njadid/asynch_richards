@@ -3127,24 +3127,18 @@ void navid_wo_et(double t, const double *const y_i, unsigned int dim, const doub
 
 
 
-double flux_inf_layered(double * theta, double * K_sat, double * psi_sat, double * lambda, double * theta_s, double * theta_r, double * S_L, int i)
+double flux_inf_layered(double * theta, double * K_sat, double * psi_sat, double * lambda, double * theta_s, double * theta_r, double * S_L, int idx)
 {
-		double d_total = (S_L[i] + S_L[i+1]);
-		double phi_1 = (theta[i]- theta_r[i]) / (theta_s[i] - theta_r[i]);
-		double phi_2 = (theta[i+1] - theta_r[i+1]) / (theta_s[i+1] - theta_r[i+1]);
-		// K
-		double power_k = (2.0 + 3.0 * lambda[i]) / lambda[i];
-		double K_layer1 = K_sat * pow(phi_1, power_k);
-		double K_layer2 = K_sat * pow(phi_2, power_k);
-		// Geometric average for K
-		double K_hat = (S_L1 * K_layer1 + S_L2 * K_layer2) / depth_total;
-
-		// psi
-		double power_psi = -1.0 / lambda;
-		double psi_1 = psi_sat * pow(phi_1, power_psi);
-		double psi_2 = psi_sat * pow(phi_2, power_psi);
-		
-		return K_hat * (1.0 - (psi_2 - psi_1) / S_L2);
+		double phi_1 = 1;
+		double phi_2 = (theta[idx] - theta_r[idx]) / (theta_s[idx] - theta_r[idx]);
+		double power_k = (2.0 + 3.0 * lambda[idx]) / lambda[idx];
+		double K_layer1 = K_sat[0] * pow(phi_1, power_k);
+		double K_layer2 = K_sat[1] * pow(phi_2, power_k);
+		double K_hat = (K_layer1 + K_layer2) / 2.0;
+		double power_psi = -1.0 / lambda[idx];
+		double psi_1 = psi_sat[0];
+		double psi_2 = psi_sat[1] * pow(phi_2, power_psi);
+		return K_hat * (1.0 - (psi_2 - psi_1) / S_L[1]);
 }
 
 double flux_layered(double * theta, double * K_sat, double * psi_sat, double * lambda, double * theta_s, double * theta_r, double * S_L, int idx)
@@ -3260,14 +3254,14 @@ void navid_layered_params(double t, const double *const y_i, unsigned int dim, c
 		e_pot_rem = e_pot_rem-e_t[i];
 		et_tot += e_t[i];
 	}
-	
+
 	double q_inf = q_t[0];
-	double q_pond_inf = flux_inf_pond(theta_s, s_t[0], K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L[0], S_L[1], K_scheme);
+	double q_pond_inf = flux_inf_layered(s_t, K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L, 1);
 	if (q_rain > q_pond_inf)
 	{
 		dsp = q_rain - q_pond_inf - q_pl;
 		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0];
-		extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0]) / h : 0.0;
+		extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
 		dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
 		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0] - extra_flux;
 	}
@@ -3275,7 +3269,7 @@ void navid_layered_params(double t, const double *const y_i, unsigned int dim, c
 	{
 		dsp = -q_pl;
 		ds0 = (q_rain - q_inf - e_t[0]) / S_L[0];
-		extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0]) / h : 0.0;
+		extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
 		dsp = -q_pl + extra_flux * S_L[0];
 		ds0 = (q_rain - q_inf - e_t[0]) / S_L[0] - extra_flux;
 	}
