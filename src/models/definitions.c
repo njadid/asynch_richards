@@ -1366,7 +1366,7 @@ void InitRoutines(
 			vals[11] = BC_lambda;
 			vals[12] = -1 * pow(10, psi_sat) * 10.0 * 0.01;
 		}
-		else if (model_uid==10011)
+		else if (model_uid==10010)
 		{
 			double* vals = params;
 			double A_i = params[0];
@@ -1400,7 +1400,7 @@ void InitRoutines(
 			
 
 		}
-		else if (model_uid==10010)
+		else if (model_uid==10011)
 		{
 			double* vals = params;
 			double A_i = params[0];

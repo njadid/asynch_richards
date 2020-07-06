@@ -3365,6 +3365,26 @@ void navid_layered_params(double t, const double *const y_i, unsigned int dim, c
 }
 
 
+double flux_inf_layered_ponding(double theta_1,  double K_sat_1, double psi_sat_1 , double lambda_1, double theta_s_1, double theta_r_1, double S_L_1, double s_p)
+{
+		double total_depth = s_p + S_L_1;
+		float phi_1 = (theta_1 - theta_r_1) / (theta_s_1 - theta_r_1);
+		
+		float K_pond = K_sat_1; // ponded surface
+		float power_k_1 = (2.0 + 3.0 * lambda_1) / lambda_1;
+		float K_layer2 = K_sat_1 * pow(phi_1, power_k_1);
+		// Simple averaging for K
+		// float K_hat = (K_pond * s_p + K_layer2 * S_L_1) / total_depth;
+		//TODO:
+		//Add geometric Averaging for K
+		float K_hat = pow(K_pond * K_layer2,0.5);
+		
+		// psi
+		float power_psi_1 = -1.0 / lambda_1;
+		float psi_1 = psi_sat_1 * pow(phi_1, power_psi_1);
+		return K_hat * (1.0 - (-s_p +psi_1) / (total_depth/2.0));
+}
+
 // model_uid = 10011
 void navid_layered_params_pond(double t, const double *const y_i, unsigned int dim, const double *const y_p, unsigned short num_parents, unsigned int max_dim, const double *const global_params, const double *const params, const double *const forcing_values, const QVSData *const qvs, int state, void *user, double *ans, double h)
 {
@@ -3420,20 +3440,20 @@ void navid_layered_params_pond(double t, const double *const y_i, unsigned int d
 	double extra_flux 	= 0.0;
 	double ds_p 		= 0.0;
 	double d_ss 		= 0.0;
-	for (i = 0; i < 10; i++)
-	{
-		s_t[i] = y_i[i + 2];
-		if (s_t[i] > theta_s[i])
-		{
-			// d_ss = (s_t[i] - theta_s) * S_L[i] / h;
-			// // ds_p = d_ss;
-			s_t[i] = theta_s[i]-0.01;
-		}
-		else if (s_t[i] < theta_r[i])
-		{
-			s_t[i] = theta_r[i] + 0.01;
-		}
-	}
+	// for (i = 0; i < 10; i++)
+	// {
+	// 	s_t[i] = y_i[i + 2];
+	// 	if (s_t[i] > theta_s[i])
+	// 	{
+	// 		// d_ss = (s_t[i] - theta_s) * S_L[i] / h;
+	// 		// // ds_p = d_ss;
+	// 		s_t[i] = theta_s[i]-0.01;
+	// 	}
+	// 	else if (s_t[i] < theta_r[i])
+	// 	{
+	// 		s_t[i] = theta_r[i] + 0.01;
+	// 	}
+	// }
 	double q_rain = forcing_values[0] * c_1; // m/min
 
 	double q_sl = k_3 * s_t[5] * S_L[5]; // s_s > theta_r ? k_3 * (s_s - theta_r)  * (h_b - L_Top) : 0.0;	//[m/min]
@@ -3480,14 +3500,22 @@ void navid_layered_params_pond(double t, const double *const y_i, unsigned int d
 	// }
 
 	double q_inf = q_t[0];
-	double q_pond_inf = flux_inf_layered(s_t[0],s_t[1], K_sat[0], K_sat[1], psi_sat[0],psi_sat[1], bc_lambda[0],bc_lambda[1], theta_s[0],theta_s[1],	 theta_r[0], theta_r[1], S_L[0],S_L[1]);
-	if (q_rain > q_pond_inf)
+	double q_pond_inf = flux_inf_layered_ponding(s_t[0], K_sat[0],  psi_sat[0],bc_lambda[0],theta_s[0],theta_r[0], S_L[0], s_p);
+	if (s_p> 0)
 	{
 		dsp = q_rain - q_pond_inf - q_pl;
 		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0];
 		extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
 		dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
 		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0] - extra_flux;
+	}
+	else if (s_p==0.0 && q_rain>q_inf ){
+		dsp = q_rain - q_pl;
+		ds0 = (- e_t[0]) / S_L[0];
+		extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
+		dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
+		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0] - extra_flux;
+
 	}
 	else
 	{
