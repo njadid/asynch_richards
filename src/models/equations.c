@@ -2098,7 +2098,7 @@ float flux_inf_pond(float theta_1, float theta_2, float K_sat, float psi_sat, fl
 		float K_layer1 = K_sat * pow(phi_1, power_k);
 		float K_layer2 = K_sat * pow(phi_2, power_k);
 		// Simple averaging for K
-		float K_hat = (K_layer1 + K_layer2) / 2.0;
+		float K_hat = (K_layer1 * S_L1 + K_layer2 * S_L2) / (S_L1 + S_L2);
 		//TODO:
 		//Add geometric Averaging for K
 
@@ -3202,6 +3202,29 @@ double flux_layered(double theta_1, double theta_2, double K_sat_1,double K_sat_
 		float psi_2 = psi_sat_2 * pow(phi_2, power_psi_2);
 		return K_hat * (1.0 - (psi_2 - psi_1) / S_L_2);
 }
+
+double flux_layered_head(double theta_1, double theta_2, double K_sat_1,double K_sat_2, double psi_sat_1 ,double psi_sat_2, double lambda_1,double lambda_2, double theta_s_1, double theta_s_2, double theta_r_1,double theta_r_2, double S_L_1, double S_L_2, double s_p)
+{
+		float depth_total = (S_L_2 + S_L_1);
+		//theta_1 = theta_1 > theta_s ? theta_s : theta_1;
+		//theta_2 = theta_2 > theta_s ? theta_s : theta_2;
+		float phi_1 = (theta_1 - theta_r_1) / (theta_s_1 - theta_r_1);
+		float phi_2 = (theta_2 - theta_r_2) / (theta_s_2 - theta_r_2);
+		// K
+		float power_k_1 = (2.0 + 3.0 * lambda_1) / lambda_1;
+		float power_k_2 = (2.0 + 3.0 * lambda_2) / lambda_2;
+		float K_layer1 = K_sat_1 * pow(phi_1, power_k_1);
+		float K_layer2 = K_sat_2 * pow(phi_2, power_k_2);
+		// Geometric average for K
+		float K_hat = (S_L_1 * K_layer1 + S_L_2 * K_layer2) / depth_total;
+
+		// psi
+		float power_psi_1 = -1.0 / lambda_1;
+		float power_psi_2 = -1.0 / lambda_2;
+		float psi_1 = psi_sat_1 * pow(phi_1, power_psi_1);
+		float psi_2 = psi_sat_2 * pow(phi_2, power_psi_2);
+		return K_hat * (1.0 - (psi_2 - psi_1- s_p) / S_L_2);
+}
 // model_uid = 10010
 void navid_layered_params(double t, const double *const y_i, unsigned int dim, const double *const y_p, unsigned short num_parents, unsigned int max_dim, const double *const global_params, const double *const params, const double *const forcing_values, const QVSData *const qvs, int state, void *user, double *ans, double h)
 {
@@ -3365,13 +3388,15 @@ void navid_layered_params(double t, const double *const y_i, unsigned int dim, c
 }
 
 
-double flux_inf_layered_ponding(double theta_1,  double K_sat_1, double psi_sat_1 , double lambda_1, double theta_s_1, double theta_r_1, double S_L_1, double s_p)
+double flux_inf_layered_ponding(double theta_1,  double K_sat_1, double psi_sat_1 , double lambda_1, double theta_s_1, double theta_r_1, double S_L_1, double theta_2,  double K_sat_2, double psi_sat_2 , double lambda_2, double theta_s_2, double theta_r_2, double S_L_2, double s_p)
 {
-		double total_depth = s_p + S_L_1;
+		double total_depth = S_L_2 + S_L_1;
 		float phi_1 = (theta_1 - theta_r_1) / (theta_s_1 - theta_r_1);
+		float phi_2 = (theta_2 - theta_r_2) / (theta_s_2 - theta_r_2);
 		
 		float K_pond = K_sat_1; // ponded surface
 		float power_k_1 = (2.0 + 3.0 * lambda_1) / lambda_1;
+		float power_k_2 = (2.0 + 3.0 * lambda_2) / lambda_2;
 		float K_layer2 = K_sat_1 * pow(phi_1, power_k_1);
 		// Simple averaging for K
 		// float K_hat = (K_pond * s_p + K_layer2 * S_L_1) / total_depth;
@@ -3382,7 +3407,8 @@ double flux_inf_layered_ponding(double theta_1,  double K_sat_1, double psi_sat_
 		// psi
 		float power_psi_1 = -1.0 / lambda_1;
 		float psi_1 = psi_sat_1 * pow(phi_1, power_psi_1);
-		return K_hat * (1.0 - (-s_p +psi_1) / (total_depth/2.0));
+		float psi_2 = psi_sat_2 * pow(phi_2, power_psi_1);
+		return K_hat * (1.0 - (-s_p +psi_2- psi_1) / (S_L_1));
 }
 
 // model_uid = 10011
@@ -3421,12 +3447,6 @@ void navid_layered_params_pond(double t, const double *const y_i, unsigned int d
 		theta_s[i] 		= 	params[10+i*5]; //18:27
 		theta_r[i] 		= 	params[11+i*5]; //28:37
 		psi_sat[i] 		= 	params[12+i*5]; //48:57
-
-		// K_sat[i] 		= 	params[8];  //8:17
-		// bc_lambda[i] 	= 	params[9];  //38:47
-		// theta_s[i] 		= 	params[10]; //18:27
-		// theta_r[i] 		= 	params[11]; //28:37
-		// psi_sat[i] 		= 	params[12]; //48:57
 	}
 	//rintf("%f",params[57]);
 	double S_L[10] 		= {0.01, 0.05, 0.05, 0.10, 0.30, 0.50, 1.0, 1.0, 1.0, 1.0}; // layer depths [m]
@@ -3440,20 +3460,20 @@ void navid_layered_params_pond(double t, const double *const y_i, unsigned int d
 	double extra_flux 	= 0.0;
 	double ds_p 		= 0.0;
 	double d_ss 		= 0.0;
-	// for (i = 0; i < 10; i++)
-	// {
-	// 	s_t[i] = y_i[i + 2];
-	// 	if (s_t[i] > theta_s[i])
-	// 	{
-	// 		// d_ss = (s_t[i] - theta_s) * S_L[i] / h;
-	// 		// // ds_p = d_ss;
-	// 		s_t[i] = theta_s[i]-0.01;
-	// 	}
-	// 	else if (s_t[i] < theta_r[i])
-	// 	{
-	// 		s_t[i] = theta_r[i] + 0.01;
-	// 	}
-	// }
+	for (i = 0; i < 10; i++)
+	{
+		s_t[i] = y_i[i + 2];
+		if (s_t[i] > theta_s[i])
+		{
+			// d_ss = (s_t[i] - theta_s) * S_L[i] / h;
+			// // ds_p = d_ss;
+			s_t[i] = theta_s[i];
+		}
+		else if (s_t[i] < theta_r[i])
+		{
+			s_t[i] = theta_r[i] + 0.01;
+		}
+	}
 	double q_rain = forcing_values[0] * c_1; // m/min
 
 	double q_sl = k_3 * s_t[5] * S_L[5]; // s_s > theta_r ? k_3 * (s_s - theta_r)  * (h_b - L_Top) : 0.0;	//[m/min]
@@ -3475,56 +3495,23 @@ void navid_layered_params_pond(double t, const double *const y_i, unsigned int d
 		et_tot += e_t[i];
 	}
 
-	// for (i = 1; i < 7; i++)
-	// {
-	// // 	// double s_lim = (s_t[i] - theta_r - 0.05)/(theta_s - theta_r - 0.05);
-	// // 	// double C_et = s_lim/pow(0.00001 + pow(s_lim,2.0),0.5);
-	// // 	// e_t[i] = s_t[i] - C_et*e_pot_rem*h > theta_r + q_t[i]/ S_L[i] ? C_et*e_pot_rem : 0.0 ;
-	// // 	// e_t[i] = e_t[i] > 1e-6 ? e_t[i] : 0.0;
-		
-	// 	// double s_lim = (s_t[i] - theta_r[i])/(theta_s[i] - theta_r[i])- 0.05;
-	// 	// double C_et = s_lim/pow(0.01 + pow(s_lim,2.0),0.5);
-	// 	// C_et = C_et < 0.0 ? 0.0 : C_et ;
-	// 	// e_t[i] = s_t[i] - C_et*e_pot_rem*h/ S_L[i] - q_t[i]*h/ S_L[i]- theta_r[i] >0.02 ? C_et*e_pot_rem : 0.0;
-	// 	// e_t[i] = e_t[i] > 1e-6 ? e_t[i] : 0.0;
-	// 	// e_pot_rem = e_pot_rem-e_t[i];
-	// 	// et_tot += e_t[i];
-
-	// 	double s_lim = (s_t[i] - theta_r[i])/(theta_s[i] - theta_r[i])- 0.5;
-	// 	double C_et = 0.5*s_lim/pow(0.01 + pow(s_lim,2.0),0.5) + 0.48;
-	// 	C_et = C_et < 0.0 ? 0.0 : C_et ;
-	// 	e_t[i] = s_t[i] - C_et*e_pot_rem*h/ S_L[i] - q_t[i]*h/ S_L[i]- theta_r[i] >0.02 ? C_et*e_pot_rem : 0.0;
-	// 	e_t[i] = e_t[i] > 1e-6 ? e_t[i] : 0.0;
-	// 	e_pot_rem = e_pot_rem-e_t[i];
-	// 	et_tot += e_t[i];
-	// }
-
 	double q_inf = q_t[0];
-	double q_pond_inf = flux_inf_layered_ponding(s_t[0], K_sat[0],  psi_sat[0],bc_lambda[0],theta_s[0],theta_r[0], S_L[0], s_p);
-	if (s_p> 0)
-	{
+	double q_pond_inf = flux_inf_layered_ponding(s_t[0], K_sat[0],  psi_sat[0],bc_lambda[0],theta_s[0],theta_r[0], S_L[0], s_t[1], K_sat[1],  psi_sat[1],bc_lambda[1],theta_s[1],theta_r[1], S_L[1], s_p);
+	q_pond_inf = q_pond_inf > (theta_s[0] - s_t[0]) / h ? (theta_s[0] - s_t[0]) / h : q_pond_inf;
+	if (s_p==0.0){
+		if (q_rain<=q_inf){
+			dsp = - q_pl;
+			ds0 = (q_rain-q_inf)/S_L[0];
+		}
+		else {
+			dsp = q_rain - q_inf;
+			ds0 = 0.0;
+		}
+	} else {
 		dsp = q_rain - q_pond_inf - q_pl;
-		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0];
-		extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
-		dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
-		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0] - extra_flux;
+		ds0 = (q_pond_inf - q_inf)/S_L[0];
 	}
-	else if (s_p==0.0 && q_rain>q_inf ){
-		dsp = q_rain - q_pl;
-		ds0 = (- e_t[0]) / S_L[0];
-		extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
-		dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
-		ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0] - extra_flux;
-
-	}
-	else
-	{
-		dsp = -q_pl;
-		ds0 = (q_rain - q_inf - e_t[0]) / S_L[0];
-		extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
-		dsp = -q_pl + extra_flux * S_L[0];
-		ds0 = (q_rain - q_inf - e_t[0]) / S_L[0] - extra_flux;
-	}
+	
 
 	ans[0] = -q + (q_pl + q_sl) * c_2;
 	for (i = 0; i < num_parents; i++)
@@ -3556,3 +3543,385 @@ void navid_layered_params_pond(double t, const double *const y_i, unsigned int d
 }
 
 
+float flux_inf_pond_GA(float theta_1, float theta_2, float K_sat, float psi_sat, float lambda, float theta_s, float theta_r, float S_L1, float S_L2, int K_scheme)
+{
+
+	if (K_scheme == 0)
+	{
+		float theta_hat = (theta_2 + theta_s) / 2.0;
+		float phi_1 = (theta_s - theta_r) / (theta_s - theta_r);
+		float phi_2 = (theta_2 - theta_r) / (theta_s - theta_r);
+
+		// K
+		float phi_k = (theta_hat - theta_r) / (theta_s - theta_r);
+		float power_k = (2.0 + 3.0 * lambda) / lambda;
+		float K_phi_hat = K_sat * pow(phi_k, power_k);
+
+		// psi
+		float power_psi = -1.0 / lambda;
+		float psi_1 = psi_sat * pow(phi_1, power_psi);
+		float psi_2 = psi_sat * pow(phi_2, power_psi);
+		return K_phi_hat * (1.0 - (psi_2 - psi_1) / S_L2);
+	}
+	else
+	{
+		float phi_1 = (theta_s - theta_r) / (theta_s - theta_r);
+		float phi_2 = (theta_2 - theta_r) / (theta_s - theta_r);
+		// K
+		float power_k = (2.0 + 3.0 * lambda) / lambda;
+		float K_layer1 = K_sat * pow(phi_1, power_k);
+		float K_layer2 = K_sat * pow(phi_2, power_k);
+		// Simple averaging for K
+		float K_hat = (K_layer1 * S_L1 + K_layer2 * S_L2) / (S_L1 + S_L2);
+		//TODO:
+		//Add geometric Averaging for K
+		// float K_hat = pow(K_layer1 *K_layer2, 0.5);
+		// psi
+		float power_psi = -1.0 / lambda;
+		float psi_1 = psi_sat * pow(phi_1, power_psi);
+		float psi_2 = psi_sat * pow(phi_2, power_psi);
+		return K_hat * (1.0 - (psi_2 - S_L1) / (S_L2));
+	}
+}
+
+
+float flux_inf_head(float theta_1, float theta_2, float K_sat, float psi_sat, float lambda, float theta_s, float theta_r, float S_L1, float S_L2, int K_scheme, double s_p)
+{
+	if (K_scheme == 0)
+	{
+		float depth_total = (S_L2 + S_L1);
+		// Geometric average on theta
+		float theta_hat = (S_L2 * theta_2 + S_L1 * theta_1) / depth_total;
+		float phi_1 = (theta_1 - theta_r) / (theta_s - theta_r);
+		float phi_2 = (theta_2 - theta_r) / (theta_s - theta_r);
+
+		// K
+		float phi_k = (theta_hat - theta_r) / (theta_s - theta_r);
+		float power_k = (2.0 + 3.0 * lambda) / lambda;
+		float K_phi_hat = K_sat * pow(phi_k, power_k);
+
+		// psi
+		float power_psi = -1.0 / lambda;
+		float psi_1 = psi_sat * pow(phi_1, power_psi);
+		float psi_2 = psi_sat * pow(phi_2, power_psi);
+
+		return K_phi_hat * (1.0 - (psi_2 - psi_1) / S_L2);
+	}
+	else
+	{
+		float depth_total = (S_L2 + S_L1);
+		//theta_1 = theta_1 > theta_s ? theta_s : theta_1;
+		//theta_2 = theta_2 > theta_s ? theta_s : theta_2;
+		float phi_1 = (theta_1 - theta_r) / (theta_s - theta_r);
+		float phi_2 = (theta_2 - theta_r) / (theta_s - theta_r);
+		// K
+		float power_k = (2.0 + 3.0 * lambda) / lambda;
+		float K_layer1 = K_sat * pow(phi_1, power_k);
+		float K_layer2 = K_sat * pow(phi_2, power_k);
+		// Geometric average for K
+		float K_hat = (S_L1 * K_layer1 + S_L2 * K_layer2) / depth_total;
+
+		// psi
+		float power_psi = -1.0 / lambda;
+		float psi_1 = psi_sat * pow(phi_1, power_psi);
+		float psi_2 = psi_sat * pow(phi_2, power_psi);
+		return K_hat * (1.0 - (psi_2 - psi_1 - s_p) / S_L2);
+	}
+}
+// model_uid = 10012 Ponding infiltration with uniform soil properties for the layers
+void navid_w_et_10012(double t, const double *const y_i, unsigned int dim, const double *const y_p, unsigned short num_parents, unsigned int max_dim, const double *const global_params, const double *const params, const double *const forcing_values, const QVSData *const qvs, int state, void *user, double *ans, double h)
+{
+	unsigned short i;
+	double s_t[10];
+	double q_t[9];
+	double dsp, ds0;
+	double e_p, e_t[5]; //
+
+	double lambda_1 = global_params[1];
+	double k_3 = global_params[4]; //[1/min]
+	double h_b = global_params[6]; //[m]
+
+	double A = global_params[8];
+	double B = global_params[9];
+	double exponent = global_params[10];
+	double v_B = global_params[11];
+	double pond_inf_coef = global_params[12];
+	int K_scheme = 1;
+
+	double e_pot = forcing_values[1] * (1e-3 / (30.0 * 24.0 * 60.0)); //[mm/month] -> [m/min]
+
+	double L = params[1];	   //[m]
+	double A_h = params[2];	   //[m^2]
+							   //double h_r = params[3];	//[m]
+	double invtau = params[3]; //[1/min]
+	double k_2 = params[4];	   //[1/min]
+	double k_i = params[5];	   //[1/min]
+	double c_1 = params[6];
+	double c_2 = params[7];
+
+	double K_sat = params[8];
+	double theta_s = (int)(params[9] * 1000) / 1000.0;
+	double theta_r = params[10];
+	double bc_lambda = params[11];
+	double psi_sat = params[12];
+
+	double S_L[10] = { 0.01, 0.05, 0.05, 0.10, 0.30, 0.50, 1.0, 1.0, 1.0, 1.0 }; // layer depths [m]
+	double L_Top = 5.0;
+
+	// Initial conditions (or from last iteration)
+	double q = y_i[0];	  //[m^3/s]
+	double s_p = y_i[1];  //[m]
+	double s_s = y_i[12]; //[m]
+	double q_b = y_i[15]; //[m^3/s]
+	double extra_flux = 0.0;
+	double ds_p = 0.0;
+	double d_ss = 0.0;
+	for (i = 0; i < 10; i++)
+	{
+		s_t[i] = y_i[i + 2];
+		if (s_t[i] > theta_s)
+		{
+			s_t[i] = theta_s;
+		}
+		else if (s_t[i] < theta_r)
+		{
+			s_t[i] = theta_r + 0.01;
+		}
+	}
+	double q_rain = forcing_values[0] * c_1; // m/min
+
+	double q_sl = k_3 * s_t[5] * S_L[5]; // s_s > theta_r ? k_3 * (s_s - theta_r)  * (h_b - L_Top) : 0.0;	//[m/min]
+	double q_pl = k_2 * s_p;
+	for (i = 0; i < 9; i++)
+		// q_t[i] = flux_inf(s_t[i], s_t[i + 1], K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L[i], S_L[i + 1], K_scheme);
+		q_t[i] = flux_inf_head(s_t[i], s_t[i + 1], K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L[i], S_L[i + 1], K_scheme, s_p);
+
+
+	double et_tot = 0.0;
+	double e_pot_rem = e_pot;
+	for (i = 0; i < 5; i++)
+	{
+		double s_lim = s_t[i] - theta_r - 0.05;
+		double C_et = s_lim / pow(0.0005 + pow(s_lim, 2.0), 0.5);
+		e_t[i] = s_t[i] - C_et*e_pot_rem*h > theta_r + q_t[i] / S_L[i]+0.01 ? C_et*e_pot_rem : 0.0;
+		e_t[i] = e_t[i] > 1e-6 ? e_t[i] : 0.0;
+		e_pot_rem = e_pot_rem - e_t[i];
+		et_tot += e_t[i];
+	}
+	// for (i = 0; i < 7; i++)
+	// {
+	// 	double s_lim = (s_t[i] - theta_r)/(theta_s - theta_r)- 0.02;
+	// 	double C_et = s_lim/pow(0.1 + pow(s_lim,2.0),0.5);
+	// 	C_et = C_et < 0.0 ? 0.0 : C_et ;
+	// 	e_t[i] = s_t[i] - C_et*e_pot_rem*h/ S_L[i] - q_t[i]*h/ S_L[i]- theta_r >0.02 ? C_et*e_pot_rem : 0.0;
+	// 	e_t[i] = e_t[i] > 1e-6 ? e_t[i] : 0.0;
+	// 	e_pot_rem = e_pot_rem-e_t[i];
+	// 	et_tot += e_t[i];
+	// }
+	double q_inf = q_t[0];
+	//double q_inf_pot = flux_inf_pond(theta_s, s_t[0], K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L[0], S_L[1], K_scheme);
+	double q_pond_inf = flux_inf_pond(theta_s, s_t[0], K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L[0], S_L[1], K_scheme);
+	if (s_p == 0.0) {
+		if (q_rain > q_pond_inf)
+		{
+			dsp = q_rain - q_pond_inf - q_pl;
+			ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0];
+			extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0]) / h : 0.0;
+			dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
+			ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0] - extra_flux;
+		} else {
+			dsp = 0.0;
+			ds0 = (q_rain - q_inf - e_t[0]) / S_L[0];
+			extra_flux = ds0 * h + s_t[0] > theta_s ? ds0 - (theta_s - s_t[0]) / h : 0.0;
+			dsp = extra_flux * S_L[0];
+			ds0 = (q_rain - q_inf - e_t[0]) / S_L[0] - extra_flux;
+		}
+	}
+	else
+	{
+		q_pond_inf = flux_inf_pond_GA(theta_s, s_t[0], K_sat*pond_inf_coef, psi_sat, bc_lambda, theta_s, theta_r, s_p, S_L[0], K_scheme);
+		q_pond_inf = q_pond_inf > (theta_s - s_t[0]) / h * S_L[0] ? (theta_s - s_t[0]) / h * S_L[0] : q_pond_inf;
+		dsp = q_rain - q_pond_inf - q_pl;
+		ds0 = (q_pond_inf - q_inf) / S_L[0];
+	}
+	ans[0] = -q + (q_pl + q_sl) * c_2;
+	for (i = 0; i < num_parents; i++)
+		ans[0] += y_p[i * dim];
+	ans[0] = invtau * pow(q, lambda_1) * ans[0];
+
+	//Hillslope
+	ans[1] = dsp; // S_P
+	ans[2] = ds0; // S_t[0]
+	for (i = 1; i < 5; i++)
+	{
+		ans[i + 2] = (q_t[i - 1] - q_t[i] - e_t[i]) / S_L[i]; // S_t[1:98]
+	}
+	for (i = 5; i < 9; i++)
+	{
+		ans[i + 2] = (q_t[i - 1] - q_t[i]) / S_L[i]; // S_t[1:98]
+	}
+	ans[7] = (q_t[4] - q_t[5]) / S_L[5]-k_3 * s_t[5];
+
+	ans[11] = (4.0 * ans[10] - ans[9]) / 3.0; // S_t[99] good SM
+	ans[12] = et_tot;							  // S_s
+												  //Additional states
+	ans[13] = forcing_values[0] * c_1;
+	ans[14] = q_pl; // q_pl;
+	ans[15] = q_sl * A_h - q_b * 60.0;
+	for (i = 0; i < num_parents; i++)
+		ans[15] += y_p[i * dim + 15] * 60.0;
+	ans[15] *= v_B / L;
+}
+
+
+// model_uid = 10013 Ponding infiltration with uniform soil properties for the layers
+void navid_w_et_10013(double t, const double *const y_i, unsigned int dim, const double *const y_p, unsigned short num_parents, unsigned int max_dim, const double *const global_params, const double *const params, const double *const forcing_values, const QVSData *const qvs, int state, void *user, double *ans, double h)
+{
+	unsigned short i;
+	double s_t[10], K_sat[10], psi_sat[10], bc_lambda[10], theta_s[10], theta_r[10];
+	double q_t[9];
+	double dsp, ds0;
+	double e_p, e_t[5]; //
+
+	double lambda_1 = global_params[1];
+	double k_3 		= global_params[4]; //[1/min]
+	double h_b 		= global_params[6]; //[m]
+
+	double A 		= global_params[8];
+	double B 		= global_params[9];
+	double exponent = global_params[10];
+	double v_B 		= global_params[11];
+	double pond_inf_coef = global_params[12];
+	double e_pot 	= forcing_values[1] * (1e-3 / (30.0 * 24.0 * 60.0)); //[mm/month] -> [m/min]
+
+	double L 		= params[1];	   //[m]
+	double A_h 		= params[2];	   //[m^2]
+							   //double h_r = params[3];	//[m]
+	double invtau 	= params[3]; //[1/min]
+	double k_2 		= params[4];	   //[1/min]
+	double k_i 		= params[5];	   //[1/min]
+	double c_1 		= params[6];
+	double c_2 		= params[7];
+	int K_scheme 	= 1;
+	for (i = 0; i < 10; i++)
+	{
+		K_sat[i] 		= 	params[8+i*5];  //8:17
+		bc_lambda[i] 	= 	params[9+i*5];  //38:47
+		theta_s[i] 		= 	params[10+i*5]; //18:27
+		theta_r[i] 		= 	params[11+i*5]; //28:37
+		psi_sat[i] 		= 	params[12+i*5]; //48:57
+	}
+	//rintf("%f",params[57]);
+	double S_L[10] 		= {0.01, 0.05, 0.05, 0.10, 0.30, 0.50, 1.0, 1.0, 1.0, 1.0}; // layer depths [m]
+	double L_Top 		= 5.0;
+
+	// Initial conditions (or from last iteration)
+	double q 			= y_i[0];	  //[m^3/s]
+	double s_p 			= y_i[1];  //[m]
+	double s_s 			= y_i[12]; //[m]
+	double q_b 			= y_i[15]; //[m^3/s]
+	double extra_flux 	= 0.0;
+	double ds_p 		= 0.0;
+	double d_ss 		= 0.0;
+	for (i = 0; i < 10; i++)
+	{
+		s_t[i] = y_i[i + 2];
+		if (s_t[i] > theta_s[i])
+		{
+			// d_ss = (s_t[i] - theta_s) * S_L[i] / h;
+			// // ds_p = d_ss;
+			s_t[i] = theta_s[i];
+		}
+		else if (s_t[i] < theta_r[i])
+		{
+			s_t[i] = theta_r[i] + 0.01;
+		}
+	}
+	double q_rain = forcing_values[0] * c_1; // m/min
+
+	double q_sl = k_3 * s_t[5] * S_L[5]; // s_s > theta_r ? k_3 * (s_s - theta_r)  * (h_b - L_Top) : 0.0;	//[m/min]
+	double q_pl = k_2 * s_p;
+	for (i = 0; i < 9; i++)
+		q_t[i] = flux_layered_head(s_t[i],s_t[i+1], K_sat[i], K_sat[i+1], psi_sat[i],psi_sat[i+1], bc_lambda[i],bc_lambda[i+1], theta_s[i],theta_s[i+1],
+		 theta_r[i], theta_r[i+1], S_L[i],S_L[i+1], s_p);
+		 // q_t[i] = flux_layered(s_t, K_sat, psi_sat, bc_lambda, theta_s, theta_r, S_L, i);
+		
+	
+	double et_tot=0.0;
+	double e_pot_rem = e_pot;
+	// for (i = 0; i < 5; i++)
+	// {
+	// 	double s_lim = s_t[i] - theta_r[i] - 0.05;
+	// 	double C_et = s_lim/pow(0.0005 + pow(s_lim,2.0),0.5);
+	// 	e_t[i] = s_t[i] - C_et*e_pot_rem*h > theta_r[i] + q_t[i]/ S_L[i] ? C_et*e_pot_rem : 0.0 ;
+	// 	e_pot_rem = e_pot_rem-e_t[i];
+	// 	et_tot += e_t[i];
+	// }
+
+	for (i = 0; i < 5; i++)
+	{
+		double s_lim = (s_t[i] - theta_r[i])/(theta_s[i] - theta_r[i])- 0.02;
+		double C_et = s_lim/pow(0.1 + pow(s_lim,2.0),0.5);
+		C_et = C_et < 0.0 ? 0.0 : C_et ;
+		// e_t[i] = s_t[i] - C_et*e_pot_rem*h/ S_L[i] - q_t[i]*h/ S_L[i]- theta_r[i] >0.02 ? C_et*e_pot_rem : 0.0;
+		// e_t[i] = e_t[i] > 1e-6 ? e_t[i] : 0.0;
+		e_t[i] = s_t[i] - C_et*e_pot_rem*h > theta_r[i] + q_t[i] / S_L[i]+0.01 ? C_et*e_pot_rem : 0.0;
+		e_t[i] = e_t[i] > 1e-6 ? e_t[i] : 0.0;
+		e_pot_rem = e_pot_rem-e_t[i];
+		et_tot += e_t[i];
+	}
+	double q_inf = q_t[0];
+	double q_pond_inf = flux_inf_pond(theta_s[0], s_t[0], K_sat[0], psi_sat[0], bc_lambda[0], theta_s[0], theta_r[0], S_L[0], S_L[1], K_scheme);
+	if (s_p == 0.0) {
+		if (q_rain > q_pond_inf)
+		{
+			dsp = q_rain - q_pond_inf - q_pl;
+			ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0];
+			extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
+			dsp = q_rain - q_pond_inf - q_pl + extra_flux * S_L[0];
+			ds0 = (q_pond_inf - q_inf - e_t[0]) / S_L[0] - extra_flux;
+		} else {
+			dsp = 0.0;
+			ds0 = (q_rain - q_inf - e_t[0]) / S_L[0];
+			extra_flux = ds0 * h + s_t[0] > theta_s[0] ? ds0 - (theta_s[0] - s_t[0]) / h : 0.0;
+			dsp = extra_flux * S_L[0];
+			ds0 = (q_rain - q_inf - e_t[0]) / S_L[0] - extra_flux;
+		}
+	}
+	else
+	{
+		q_pond_inf = flux_inf_pond_GA(theta_s[0], s_t[0], K_sat[0]*pond_inf_coef, psi_sat[0], bc_lambda[0], theta_s[0], theta_r[0], s_p, S_L[0], K_scheme);
+		q_pond_inf = q_pond_inf > (theta_s[0] - s_t[0]) / h * S_L[0] ? (theta_s[0] - s_t[0]) / h * S_L[0] : q_pond_inf;
+		dsp = q_rain - q_pond_inf - q_pl;
+		ds0 = (q_pond_inf - q_inf) / S_L[0];
+	}
+	
+
+	ans[0] = -q + (q_pl + q_sl) * c_2;
+	for (i = 0; i < num_parents; i++)
+		ans[0] += y_p[i * dim];
+	ans[0] = invtau * pow(q, lambda_1) * ans[0];
+
+	//Hillslope
+	ans[1] = dsp; // S_P
+	ans[2] = ds0; // S_t[0]
+	for (i = 1; i < 5; i++)
+	{
+		ans[i + 2] = (q_t[i - 1] - q_t[i]-e_t[i]) / S_L[i]; // S_t[1:98]
+	}
+	for (i = 5; i < 9; i++)
+	{
+		ans[i + 2] = (q_t[i - 1] - q_t[i]) / S_L[i]; // S_t[1:98]
+	}
+	ans[7] = (q_t[4] - q_t[5]) / S_L[5] - k_3 * s_t[5];
+
+	ans[11] = (4.0 * ans[10] - ans[9]) / 3.0; // S_t[99] good SM
+	ans[12] = et_tot;							  // S_s
+											  //Additional states
+	ans[13] = forcing_values[0] * c_1;
+	ans[14] = q_pl; // q_pl;
+	ans[15] = q_sl * A_h - q_b * 60.0;
+	for (i = 0; i < num_parents; i++)
+		ans[15] += y_p[i * dim + 15] * 60.0;
+	ans[15] *= v_B / L;
+}
